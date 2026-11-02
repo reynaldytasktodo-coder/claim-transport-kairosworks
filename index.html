@@ -365,7 +365,10 @@ async function api(url, opts = {}, tries = 3) {
     const body = await res.text().catch(() => '');
     if (body.includes('storageQuotaExceeded')) throw Object.assign(new Error('quota'), { code: 'quota' });
     const retryable = res.status === 429 || res.status >= 500 || body.includes('rateLimitExceeded');
-    if (!retryable || attempt >= tries) throw Object.assign(new Error(`drive ${res.status}`), { status: res.status });
+    if (!retryable || attempt >= tries) {
+      const reason = body.match(/accessNotConfigured|SERVICE_DISABLED|insufficientPermissions|insufficientScopes|ACCESS_TOKEN_SCOPE_INSUFFICIENT/)?.[0] || '';
+      throw Object.assign(new Error(`drive ${res.status}`), { status: res.status, reason });
+    }
     await wait(attempt * 800);
   }
 }
@@ -530,7 +533,7 @@ function exampleEvent() {
 
 const MONTHS_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 const ic = name => `<svg class="ic"><use href="#i-${name}"/></svg>`;
-let view = 'home', openId = null, pdfBusy = false, booted = false;
+let view = 'home', openId = null, pdfBusy = false, booted = false, bootFailed = false;
 
 const inMonth = () => events.filter(e => (e.date || '').startsWith(viewMonth)).sort((a, b) => (a.date || '').localeCompare(b.date || ''));
 const findEv = el => events.find(e => e.id === el.closest('[data-ev]')?.dataset.ev);
@@ -881,7 +884,7 @@ document.addEventListener('paste', e => {
 });
 
 $('add').addEventListener('click', () => {
-  if (!booted) { setStatus('Data masih dimuat. Coba lagi sebentar.'); return; }
+  if (!booted) { setStatus(bootFailed ? 'Data belum berhasil dimuat. Lihat pesan di layar, lalu muat ulang halaman.' : 'Data masih dimuat. Coba lagi sebentar.', bootFailed); return; }
   clearExample();
   const now = new Date(), today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const ev = newEvent(today.startsWith(viewMonth) ? today : `${viewMonth}-01`);
@@ -1207,7 +1210,14 @@ async function boot() {
     if (saved) settings = { ...settings, ...saved };
     events = await Store.loadEvents();
   } catch (e) {
-    $('claims').innerHTML = '<div class="card empty"><b>Data tidak bisa dimuat dari Google Drive</b><span>Periksa koneksi Anda, lalu muat ulang halaman ini.</span></div>';
+    const disabled = /accessNotConfigured|SERVICE_DISABLED/.test(e.reason || ''), noScope = /insufficient|SCOPE/i.test(e.reason || '');
+    // A token granted before the storage change lacks the new permission, so the next load must ask again.
+    if (noScope) Auth.drop();
+    const help = disabled ? 'Google Drive API belum aktif. Admin perlu menekan Enable di Google Cloud, tunggu beberapa menit, lalu muat ulang halaman ini.'
+      : noScope ? 'Izin Google Drive belum lengkap. Muat ulang halaman ini, masuk lagi, dan setujui izin Drive.'
+      : 'Periksa koneksi Anda, lalu muat ulang halaman ini.';
+    bootFailed = true;
+    $('claims').innerHTML = `<div class="card empty"><b>Data tidak bisa dimuat dari Google Drive</b><span>${help}</span><small>Kode: ${esc(e.status || 'koneksi')}${e.reason ? ' ' + esc(e.reason) : ''}</small></div>`;
     setStatus('Data tidak bisa dimuat dari Google Drive.', true);
     return;
   }
