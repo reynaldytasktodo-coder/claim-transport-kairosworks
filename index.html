@@ -1,0 +1,1248 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#cb3a3a">
+<title>Claim Transport</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap">
+<style>
+/* Layout: a phone-style app column. Red curved header, floating white cards, bottom bar with a raised add button. One deliberate light look. */
+:root {
+  color-scheme: light;
+  --bg: #f6f3f3; --surface: #ffffff; --field: #f6f1f1; --fg: #231a1b; --muted: #75696a;
+  --line: #eee6e6; --brand: #cb3a3a; --brand-deep: #a92b2c; --on-brand: #ffffff; --tint: #fbe6e4;
+  --warn: #8a5a00; --warn-bg: #fdf1d8; --danger: #b3261e; --shadow: 0 6px 22px rgba(120, 40, 40, .10);
+  --sans: "Manrope", -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; }
+img { max-width: 100%; }
+.login { position: fixed; inset: 0; z-index: 20; background: var(--brand); display: grid; place-items: center; overflow-y: auto; padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); }
+.login-card { background: var(--surface); border-radius: 26px; padding: 28px 22px; max-width: 400px; width: 100%; display: grid; gap: 14px; text-align: center; justify-items: center; box-shadow: 0 14px 40px rgba(70, 10, 10, .3); }
+.login-card h1 { font-size: 24px; font-weight: 800; }
+.login-card p { margin: 0; color: var(--muted); font-size: 14px; }
+.login-mark { width: 68px; height: 68px; border-radius: 22px; background: var(--brand); color: var(--on-brand); display: grid; place-items: center; }
+.login-mark .ic { width: 34px; height: 34px; }
+.signin { width: 100%; min-height: 52px; border-radius: 16px; background: var(--fg); color: #fff; font-weight: 800; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
+.signin svg { width: 22px; height: 22px; background: #fff; border-radius: 50%; padding: 3px; }
+#login-msg { color: var(--danger); font-weight: 600; }
+#login-msg:empty { display: none; }
+.outline { min-height: 46px; border-radius: 14px; background: var(--tint); color: var(--brand-deep); font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; padding: 0 14px; }
+.account-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+body { background: var(--bg); color: var(--fg); font: 500 15px/1.45 var(--sans); }
+.app { max-width: 560px; margin: 0 auto; min-height: 100%; padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px)); }
+.gut { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.ic { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
+input, select { font: 600 16px var(--sans); color: var(--fg); background: var(--field); border: 1.5px solid transparent; border-radius: 12px; padding: 11px 13px; width: 100%; min-width: 0; min-height: 46px; }
+select { -webkit-appearance: none; appearance: none; padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23cb3a3a' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; }
+input[type="date"] { -webkit-appearance: none; appearance: none; }
+input::-webkit-date-and-time-value { text-align: left; }
+input.bad { border-color: var(--danger); }
+input:focus, select:focus { outline: none; border-color: var(--brand); background-color: var(--surface); }
+button:focus-visible, .add-proof:focus-within { outline: 2px solid var(--fg); outline-offset: 2px; }
+label.f { display: grid; gap: 5px; font-size: 13px; font-weight: 600; color: var(--muted); min-width: 0; }
+.stack { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; align-items: start; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+
+/* Header */
+.hero { background: var(--brand); color: var(--on-brand); border-radius: 0 0 30px 30px; padding-top: calc(18px + env(safe-area-inset-top, 0px)); padding-bottom: 54px; display: grid; gap: 14px; }
+.hero.small { padding-bottom: 46px; }
+.hero-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+.hero-top > div { min-width: 0; flex: 1; }
+.hero h1 { font-size: 22px; font-weight: 800; line-height: 1.2; overflow-wrap: anywhere; }
+.hero small { font-size: 13px; opacity: .88; }
+.round { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 255, 255, .18); color: var(--on-brand); flex: none; font-size: 12px; font-weight: 700; }
+.round.armed { background: var(--on-brand); color: var(--danger); width: auto; border-radius: 21px; padding: 0 14px; }
+.grand { display: grid; gap: 1px; }
+.grand span { font-size: 13px; opacity: .9; }
+.grand b { font-size: 34px; font-weight: 800; line-height: 1.15; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.lift { margin-top: -30px; display: grid; gap: 14px; }
+
+/* Cards */
+.card { background: var(--surface); border-radius: 20px; box-shadow: var(--shadow); padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.month { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px; border-radius: 26px; }
+.month b { font-weight: 800; font-size: 16px; }
+.month button { width: 40px; height: 40px; border-radius: 50%; background: var(--tint); color: var(--brand); display: grid; place-items: center; }
+.section-title { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-top: 4px; }
+.section-title h2 { font-size: 17px; font-weight: 800; }
+.section-title span { font-size: 13px; color: var(--muted); }
+.notice { background: var(--warn-bg); color: var(--warn); border-radius: 16px; padding: 12px 14px; font-size: 14px; }
+.promo { background: var(--brand-deep); color: var(--on-brand); border-radius: 18px; padding: 14px 16px; display: flex; gap: 12px; align-items: center; font-weight: 700; font-size: 14px; }
+.claims { display: grid; gap: 12px; }
+.claim { width: 100%; text-align: left; background: var(--surface); border-radius: 20px; box-shadow: var(--shadow); padding: 12px; display: grid; grid-template-columns: 58px minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+.date-tile { background: var(--brand); color: var(--on-brand); border-radius: 15px; height: 62px; display: grid; place-content: center; text-align: center; line-height: 1.1; }
+.date-tile b { font-size: 22px; font-weight: 800; }
+.date-tile span { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.claim-main { min-width: 0; display: grid; gap: 1px; }
+.claim-main .kind { font-size: 12px; font-weight: 700; color: var(--brand); }
+.claim-main b { font-weight: 800; font-size: 15px; overflow-wrap: anywhere; }
+.claim-main small { color: var(--muted); font-size: 12.5px; overflow-wrap: anywhere; }
+.claim-amt { font-weight: 800; font-size: 14px; text-align: right; font-variant-numeric: tabular-nums; }
+.chip { white-space: nowrap; display: inline-block; width: fit-content; font-size: 11.5px; font-weight: 700; padding: 2px 9px; border-radius: 99px; background: var(--warn-bg); color: var(--warn); }
+.empty { text-align: center; color: var(--muted); padding: 36px 20px; display: grid; gap: 10px; justify-items: center; }
+.empty .tile { width: 64px; height: 64px; border-radius: 20px; background: var(--tint); color: var(--brand); display: grid; place-items: center; }
+
+/* Claim detail */
+.leg-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+.leg-head h3 { font-size: 15px; font-weight: 800; }
+.leg-head .tag { background: var(--tint); color: var(--brand); border-radius: 99px; padding: 3px 11px; font-size: 13px; font-weight: 800; }
+.stops { position: relative; display: grid; gap: 8px; }
+.stops::before { content: ""; position: absolute; left: 10px; top: 56px; bottom: 34px; border-left: 2px dashed var(--brand); opacity: .45; }
+.stop { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: end; }
+.mark { height: 46px; display: grid; place-items: center; color: var(--brand); }
+.ring { width: 16px; height: 16px; border-radius: 50%; border: 4px solid var(--fg); background: var(--surface); }
+.pin { width: 22px; height: 22px; fill: var(--brand); stroke: var(--surface); stroke-width: 1.5; }
+.fare-line { display: flex; justify-content: space-between; gap: 10px; font-size: 13.5px; color: var(--muted); background: var(--field); border-radius: 12px; padding: 10px 13px; }
+.fare-line b { color: var(--fg); font-weight: 800; white-space: nowrap; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto 36px; gap: 4px 8px; align-items: center; font-size: 14px; font-weight: 700; }
+.row > input[data-f="val"] { grid-column: 1 / -1; grid-row: 2; font-variant-numeric: tabular-nums; }
+.row .val { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.row button { height: 36px; border-radius: 50%; color: var(--muted); display: grid; place-items: center; font-size: 12px; }
+.row button.armed, .quiet.armed { color: var(--danger); }
+.adders { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { min-height: 40px; padding: 0 14px; border-radius: 20px; background: var(--tint); color: var(--brand-deep); font-size: 13.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.quiet { min-height: 36px; padding: 0 10px; border-radius: 18px; color: var(--muted); font-size: 13px; font-weight: 700; }
+.total { display: flex; justify-content: space-between; align-items: center; gap: 10px; background: var(--tint); border-radius: 14px; padding: 11px 14px; font-weight: 800; }
+.total b { color: var(--brand-deep); font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.proof { display: grid; gap: 10px; padding: 12px; border: 1.5px dashed #e3c9c7; border-radius: 16px; }
+.proof.drag { border-color: var(--brand); background: var(--tint); }
+.proof p { margin: 0; font-size: 12.5px; color: var(--muted); }
+.proof h4 { margin: 0; font-size: 14px; font-weight: 800; }
+.thumbs { display: flex; flex-wrap: wrap; gap: 8px; }
+.thumb { position: relative; width: 88px; height: 128px; border-radius: 12px; overflow: hidden; background: var(--field); }
+.thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+.thumb button { position: absolute; top: 4px; right: 4px; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 15px; background: var(--surface); color: var(--danger); display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.thumb button .ic { width: 16px; height: 16px; }
+.thumb span { position: absolute; left: 0; right: 0; bottom: 0; font-size: 11px; font-weight: 700; text-align: center; padding: 2px; color: var(--on-brand); background: var(--brand); }
+.add-proof { position: relative; cursor: pointer; width: fit-content; }
+.add-proof input { position: absolute; inset: 0; opacity: 0; width: 100%; min-height: 0; height: 100%; padding: 0; cursor: pointer; }
+.add-routes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.add-routes .pill { background: var(--surface); box-shadow: var(--shadow); min-height: 48px; border-radius: 16px; }
+.save-state { font-size: 12px; opacity: .9; }
+
+/* Summary */
+.sum-row { width: 100%; text-align: left; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.sum-row:last-child { border-bottom: 0; }
+.sum-row b { font-weight: 700; overflow-wrap: anywhere; }
+.sum-row small { color: var(--muted); font-size: 12.5px; grid-column: 1; }
+.sum-row .amt { grid-column: 2; grid-row: 1 / 3; align-self: center; font-weight: 800; font-variant-numeric: tabular-nums; }
+.check { display: flex; gap: 10px; align-items: center; font-size: 14px; font-weight: 600; min-height: 44px; }
+.check input { width: 20px; height: 20px; min-height: 0; flex: none; accent-color: var(--brand); }
+.cta { width: 100%; min-height: 52px; border-radius: 16px; background: var(--brand); color: var(--on-brand); font-weight: 800; font-size: 15.5px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+
+/* Bottom bars and messages */
+.nav, .donebar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 560px; z-index: 5; background: var(--surface); border-radius: 24px 24px 0 0; box-shadow: 0 -6px 24px rgba(120, 40, 40, .12); }
+.nav { display: grid; grid-template-columns: 1fr 1fr 70px 1fr 1fr; align-items: end; padding: 8px max(8px, env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
+.tab { display: grid; justify-items: center; gap: 2px; font-size: 11px; font-weight: 700; color: var(--muted); min-height: 50px; align-content: center; }
+.tab i { display: grid; place-items: center; width: 46px; height: 28px; border-radius: 14px; font-style: normal; }
+.tab.on { color: var(--brand); }
+.tab.on i { background: var(--brand); color: var(--on-brand); }
+.fab { justify-self: center; width: 62px; height: 62px; margin-top: -32px; border-radius: 50%; background: var(--brand); color: var(--on-brand); border: 5px solid var(--surface); display: grid; place-items: center; box-shadow: 0 6px 16px rgba(170, 45, 45, .4); }
+.fab .ic { width: 26px; height: 26px; stroke-width: 2.6; }
+.donebar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.donebar small { display: block; font-size: 12px; color: var(--muted); }
+.donebar b { font-size: 19px; font-weight: 800; color: var(--brand-deep); font-variant-numeric: tabular-nums; }
+.donebar .cta { width: auto; padding: 0 28px; min-height: 48px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(100px + env(safe-area-inset-bottom, 0px)); width: max-content; max-width: min(92vw, 500px); z-index: 6; background: var(--fg); color: #fff; font-size: 13.5px; font-weight: 600; border-radius: 14px; padding: 10px 14px; box-shadow: 0 6px 20px rgba(0, 0, 0, .25); }
+.toast.err { background: var(--danger); }
+@media (pointer: coarse) { .desk-only { display: none; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-pdf" viewBox="0 0 24 24"><path d="M12 3v12M7 11l5 5 5-5"/><path d="M4 21h16"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="m4 18 5-4 4 3 3-2 4 3"/></symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M4 16v-3l2-6h12l2 6v3"/><path d="M3 13h18v4H3z"/><path d="M6 17v2M18 17v2"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5" fill="#fff" stroke="none"/></symbol>
+</svg>
+
+<div class="login" id="login">
+  <div class="login-card">
+    <span class="login-mark"><svg class="ic"><use href="#i-car"/></svg></span>
+    <h1>Claim Transport</h1>
+    <p>Masuk dengan akun Google Anda. Klaim dan bukti tersimpan di Google Drive Anda sendiri, di folder Claim Transport. Aplikasi hanya bisa membuka file yang dibuatnya.</p>
+    <p id="login-msg" role="alert"></p>
+    <button class="signin" id="signin">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.7 1.2 9.2 3.6l6.9-6.9C35.9 2.4 30.4 0 24 0 14.6 0 6.5 5.4 2.6 13.3l8 6.2C12.5 13.7 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 7l7.2 5.6c4.2-3.9 7.1-9.6 7.1-17.1z"/><path fill="#FBBC05" d="M10.6 28.5c-.5-1.4-.7-2.9-.7-4.5s.3-3.1.7-4.5l-8-6.2C.9 16.6 0 20.2 0 24s.9 7.4 2.6 10.7l8-6.2z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.2-5.6c-2.2 1.5-5 2.3-8.7 2.3-6.2 0-11.5-4.2-13.4-9.9l-8 6.2C6.5 42.6 14.6 48 24 48z"/></svg>
+      Masuk dengan Google
+    </button>
+  </div>
+</div>
+
+<div class="app">
+  <section id="view-home">
+    <header class="hero gut">
+      <div class="hero-top">
+        <div><small id="greeting">Klaim perjalanan kerja</small><h1>Claim Transport</h1></div>
+        <button class="round" data-go="settings" aria-label="Pengaturan"><svg class="ic"><use href="#i-gear"/></svg></button>
+      </div>
+      <div class="grand"><span>Total klaim bulan ini</span><b id="grand">Rp 0</b><span id="grand-note">0 rute</span></div>
+    </header>
+    <div class="lift gut">
+      <div class="card month">
+        <button id="prev-month" aria-label="Bulan sebelumnya"><svg class="ic"><use href="#i-prev"/></svg></button>
+        <b data-month></b>
+        <button id="next-month" aria-label="Bulan berikutnya"><svg class="ic"><use href="#i-next"/></svg></button>
+      </div>
+      <div class="notice" id="example-note" hidden>Ini contoh dan tidak disimpan. Tekan tombol <b>+</b> di bawah untuk mengisi klaim Anda sendiri, dan contoh ini akan hilang.</div>
+      <div class="promo" id="missing-note" hidden><svg class="ic"><use href="#i-image"/></svg><span id="missing-text"></span></div>
+      <div class="section-title"><h2>Daftar klaim</h2><span id="claim-count"></span></div>
+      <div class="claims" id="claims"><div class="card empty">Memuat data…</div></div>
+    </div>
+  </section>
+
+  <section id="view-detail" hidden>
+    <div id="list"></div>
+  </section>
+
+  <section id="view-summary" hidden>
+    <header class="hero small gut">
+      <div class="hero-top"><div><small data-month></small><h1>Ringkasan</h1></div></div>
+    </header>
+    <div class="lift gut">
+      <div class="card">
+        <div id="summary-list"></div>
+        <div class="total"><span>Total klaim</span><b id="summary-total">Rp 0</b></div>
+      </div>
+      <div class="card">
+        <label class="check"><input type="checkbox" id="summary" checked>Sertakan halaman ringkasan di PDF</label>
+        <button class="cta" id="pdf2"><svg class="ic"><use href="#i-pdf"/></svg>Unduh PDF</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-settings" hidden>
+    <header class="hero small gut">
+      <div class="hero-top"><div><small>Claim Transport</small><h1>Pengaturan</h1></div></div>
+    </header>
+    <div class="lift gut">
+      <div class="card">
+        <label class="f">Tarif mobil per km (Rp)<input id="rate" inputmode="numeric"></label>
+        <p class="note">Tarif baru hanya berlaku untuk klaim baru. Klaim yang sudah ada tidak berubah.</p>
+      </div>
+      <div class="card">
+        <h2 style="font-size:15px;font-weight:800">Akun</h2>
+        <p class="note" id="account-email"></p>
+        <label class="f">Nama di PDF<input id="employee" autocomplete="name"></label>
+        <p class="note">Klaim, bukti, dan PDF tersimpan di folder Claim Transport pada Google Drive Anda. Jangan hapus folder itu, karena klaim Anda ada di sana.</p>
+        <div class="account-actions">
+          <a class="outline" id="drive-link" href="https://drive.google.com" target="_blank" rel="noopener">Buka folder Drive</a>
+          <button class="outline" id="signout">Keluar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<nav class="nav" id="nav" aria-label="Navigasi utama">
+  <button class="tab on" data-go="home"><i><svg class="ic"><use href="#i-home"/></svg></i>Beranda</button>
+  <button class="tab" data-go="summary"><i><svg class="ic"><use href="#i-list"/></svg></i>Ringkasan</button>
+  <button class="fab" id="add" aria-label="Tambah klaim"><svg class="ic"><use href="#i-plus"/></svg></button>
+  <button class="tab" id="pdf"><i><svg class="ic"><use href="#i-pdf"/></svg></i>Unduh PDF</button>
+  <button class="tab" data-go="settings"><i><svg class="ic"><use href="#i-gear"/></svg></i>Pengaturan</button>
+</nav>
+<div class="toast" id="status" role="status" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script src="config.js"></script>
+<script>
+const DEFAULT_RATE = 2900;
+const KINDS = ['Wedding', 'Technical Meeting', 'Sangjit', 'Prewedding'];
+const MODES = ['Car', 'Taxi', 'Green SM', 'Grab', 'Gojek', 'Bluebird'];
+const OTHER = '__other';
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const rupiah = n => 'Rp ' + Math.round(n).toLocaleString('en-US');
+
+let events = [], settings = { rate: DEFAULT_RATE, summary: true, name: '' }, viewMonth = '', showingExample = false;
+
+/* ---------- Amounts ---------- */
+
+// Accepts "8500", "8.500", "Rp 20,000 + 40,000" and "18km". Returns the parts, or null when unreadable.
+function parseParts(text, rate) {
+  const src = String(text ?? '').trim();
+  if (!src) return [];
+  const parts = [];
+  for (const raw of src.split('+')) {
+    const t = raw.trim().replace(/^rp\.?\s*/i, '');
+    const km = t.match(/^(\d+(?:[.,]\d+)?)\s*km$/i);
+    if (km) parts.push(Math.round(parseFloat(km[1].replace(',', '.')) * rate));
+    else if (/^\d[\d.,]*$/.test(t)) parts.push(parseInt(t.replace(/[.,]/g, ''), 10));
+    else return null;
+  }
+  return parts;
+}
+const sum = parts => (parts || []).reduce((a, b) => a + b, 0);
+const isCar = leg => /^(car|mobil)/i.test((leg.mode || '').trim());
+const legFare = (ev, leg) => isCar(leg) ? Math.round((parseFloat(String(leg.km).replace(',', '.')) || 0) * ev.rate) : sum(parseParts(leg.fare, ev.rate));
+const rowAmount = (ev, row) => sum(parseParts(row.val, ev.rate)) * (row.type === 'promo' ? -1 : 1);
+const legTotal = (ev, leg) => legFare(ev, leg) + leg.rows.reduce((a, r) => a + rowAmount(ev, r), 0);
+const eventTotal = ev => ev.legs.reduce((a, l) => a + legTotal(ev, l), 0);
+const fmtDate = d => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(d || ''); return m ? `${+m[3]} ${MONTHS[+m[2] - 1]} ${m[1]}` : ''; };
+const routeText = leg => `${leg.from || '…'} - ${leg.to || '…'}`;
+
+/* ---------- Google login and each employee's own Google Drive ---------- */
+
+const DRIVE_API = 'https://www.googleapis.com/drive/v3', DRIVE_UPLOAD = 'https://www.googleapis.com/upload/drive/v3';
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+const SCOPES = `${DRIVE_SCOPE} https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile`;
+const FOLDER_NAME = 'Claim Transport', FOLDER_MIME = 'application/vnd.google-apps.folder';
+const wait = ms => new Promise(res => setTimeout(res, ms));
+
+const Auth = {
+  client: null, token: null, expires: 0, waiters: [], profile: null,
+  init(clientId) {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('ct-token') || 'null');
+      if (saved && saved.expires > Date.now() + 60000) { this.token = saved.token; this.expires = saved.expires; }
+    } catch (e) {}
+    this.client = google.accounts.oauth2.initTokenClient({
+      client_id: clientId, scope: SCOPES,
+      callback: r => this.onToken(r),
+      error_callback: () => loginMessage('Login dibatalkan atau jendelanya diblokir. Tekan tombol untuk mencoba lagi.'),
+    });
+  },
+  onToken(r) {
+    if (r.error) { loginMessage('Login gagal. Tekan tombol untuk mencoba lagi.'); return; }
+    if (!google.accounts.oauth2.hasGrantedAllScopes(r, DRIVE_SCOPE)) {
+      loginMessage('Izin Google Drive belum dicentang, jadi klaim tidak bisa disimpan. Masuk lagi dan centang izin itu.');
+      return;
+    }
+    this.token = r.access_token;
+    this.expires = Date.now() + (Number(r.expires_in) || 3600) * 1000;
+    try { sessionStorage.setItem('ct-token', JSON.stringify({ token: this.token, expires: this.expires })); } catch (e) {}
+    $('login').hidden = true;
+    this.waiters.splice(0).forEach(res => res(this.token));
+  },
+  // Resolves with a valid token. When the session has expired it shows the login screen and waits, so unsaved work stays in the page.
+  ensure() {
+    if (this.token && this.expires > Date.now() + 30000) return Promise.resolve(this.token);
+    if (this.profile) loginMessage('Sesi Anda berakhir. Masuk lagi untuk melanjutkan; isian Anda tidak hilang.');
+    $('login').hidden = false;
+    return new Promise(res => this.waiters.push(res));
+  },
+  signIn() {
+    let hint = '';
+    try { hint = localStorage.getItem('ct-email') || ''; } catch (e) {}
+    this.client.requestAccessToken({ prompt: '', hint });
+  },
+  drop() {
+    this.token = null;
+    this.expires = 0;
+    try { sessionStorage.removeItem('ct-token'); } catch (e) {}
+  },
+};
+
+function loginMessage(text) { $('login-msg').textContent = text; }
+
+async function api(url, opts = {}, tries = 3) {
+  for (let attempt = 1; ; attempt++) {
+    const token = await Auth.ensure();
+    let res;
+    try {
+      res = await fetch(url, { ...opts, headers: { ...(opts.headers || {}), Authorization: `Bearer ${token}` } });
+    } catch (e) {
+      if (attempt >= tries) throw e;
+      await wait(attempt * 800);
+      continue;
+    }
+    if (res.ok) return res;
+    if (res.status === 401) { Auth.drop(); continue; }
+    const body = await res.text().catch(() => '');
+    if (body.includes('storageQuotaExceeded')) throw Object.assign(new Error('quota'), { code: 'quota' });
+    const retryable = res.status === 429 || res.status >= 500 || body.includes('rateLimitExceeded');
+    if (!retryable || attempt >= tries) throw Object.assign(new Error(`drive ${res.status}`), { status: res.status });
+    await wait(attempt * 800);
+  }
+}
+
+// Runs fn over items, a few at a time, so a long list doesn't hit Drive's rate limit.
+async function eachLimited(items, fn, limit = 5) {
+  const queue = [...items];
+  await Promise.all(Array.from({ length: Math.min(limit, queue.length) }, async () => {
+    while (queue.length) await fn(queue.shift());
+  }));
+}
+
+const Drive = {
+  folder: null, fileIds: {}, urls: {}, chains: {},
+  async init() {
+    const q = encodeURIComponent(`name='${FOLDER_NAME}' and mimeType='${FOLDER_MIME}' and trashed=false`);
+    const found = await (await api(`${DRIVE_API}/files?q=${q}&fields=files(id)&orderBy=createdTime&pageSize=1`)).json();
+    if (found.files.length) this.folder = found.files[0].id;
+    else {
+      const made = await api(`${DRIVE_API}/files?fields=id`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: FOLDER_NAME, mimeType: FOLDER_MIME }),
+      });
+      this.folder = (await made.json()).id;
+    }
+    let page = '';
+    do {
+      const pq = encodeURIComponent(`'${this.folder}' in parents and trashed=false`);
+      const r = await (await api(`${DRIVE_API}/files?q=${pq}&fields=nextPageToken,files(id,name)&orderBy=modifiedTime&pageSize=1000${page ? `&pageToken=${encodeURIComponent(page)}` : ''}`)).json();
+      r.files.forEach(f => { this.fileIds[f.name] = f.id; });
+      page = r.nextPageToken || '';
+    } while (page);
+  },
+  folderUrl() { return `https://drive.google.com/drive/folders/${this.folder}`; },
+  async readJson(id) { return (await api(`${DRIVE_API}/files/${id}?alt=media`)).json(); },
+  async upload(name, blob, mime) {
+    const id = this.fileIds[name];
+    if (id) {
+      try {
+        await api(`${DRIVE_UPLOAD}/files/${id}?uploadType=media`, { method: 'PATCH', headers: { 'Content-Type': mime }, body: blob });
+        return id;
+      } catch (e) {
+        if (e.status !== 404) throw e;
+        delete this.fileIds[name];
+      }
+    }
+    return (this.fileIds[name] = await this.create(name, blob, mime));
+  },
+  async create(name, blob, mime) {
+    const boundary = 'claim-transport-' + newId();
+    const body = new Blob([
+      `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({ name, parents: [this.folder] })}\r\n--${boundary}\r\nContent-Type: ${mime}\r\n\r\n`,
+      blob, `\r\n--${boundary}--`,
+    ]);
+    const res = await api(`${DRIVE_UPLOAD}/files?uploadType=multipart&fields=id`, { method: 'POST', headers: { 'Content-Type': `multipart/related; boundary=${boundary}` }, body });
+    return (await res.json()).id;
+  },
+  // Moved to the Drive trash rather than erased, so a mistaken delete can still be recovered there.
+  trash(id) {
+    return api(`${DRIVE_API}/files/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ trashed: true }) });
+  },
+  // Saves of one claim run in order, so two quick saves can't create duplicate files.
+  enqueue(key, fn) {
+    const next = (this.chains[key] || Promise.resolve()).catch(() => {}).then(fn);
+    this.chains[key] = next;
+    return next;
+  },
+  idle() { return Promise.all(Object.values(this.chains).map(p => p.catch(() => {}))); },
+
+  async loadEvents() {
+    const out = [];
+    const names = Object.keys(this.fileIds).filter(n => /^claim-.+\.json$/.test(n));
+    await eachLimited(names, async n => { out.push(await this.readJson(this.fileIds[n])); });
+    return out.filter(e => e && e.id && Array.isArray(e.legs));
+  },
+  saveEvent(ev) {
+    const data = JSON.stringify(ev);
+    return this.enqueue(ev.id, () => this.upload(`claim-${ev.id}.json`, new Blob([data], { type: 'application/json' }), 'application/json'));
+  },
+  deleteEvent(id) {
+    return this.enqueue(id, async () => {
+      const name = `claim-${id}.json`, fileId = this.fileIds[name];
+      if (!fileId) return;
+      await this.trash(fileId);
+      delete this.fileIds[name];
+    });
+  },
+  async loadSettings() {
+    const id = this.fileIds['settings.json'];
+    return id ? this.readJson(id) : null;
+  },
+  saveSettings(v) {
+    return this.enqueue('settings', () => this.upload('settings.json', new Blob([JSON.stringify(v)], { type: 'application/json' }), 'application/json'));
+  },
+  async putImage(blob) {
+    const id = await this.create(`bukti-${newId()}.jpg`, blob, 'image/jpeg');
+    this.urls[id] = URL.createObjectURL(blob);
+    return id;
+  },
+  // Proofs load on demand; Drive files can't be used directly as an image source.
+  async prepare(ids) {
+    const missing = [...new Set(ids)].filter(id => !this.urls[id]);
+    await eachLimited(missing, async id => {
+      try { this.urls[id] = URL.createObjectURL(await (await api(`${DRIVE_API}/files/${id}?alt=media`)).blob()); }
+      catch (e) {}
+    });
+  },
+  url(id) { return this.urls[id] || ''; },
+  deleteImage(id) { return this.trash(id); },
+};
+
+const Store = Drive;
+
+const saveError = e => e?.code === 'quota'
+  ? 'Google Drive Anda penuh. Kosongkan ruang di Drive, lalu coba lagi.'
+  : 'Gagal menyimpan ke Google Drive. Periksa koneksi Anda, lalu coba lagi.';
+
+let toastTimer;
+function setStatus(text, isErr) {
+  const s = $('status');
+  s.textContent = text;
+  s.classList.toggle('err', !!isErr);
+  s.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { s.hidden = true; }, isErr ? 7000 : 2800);
+}
+function setSave(text) {
+  const s = document.querySelector('[data-savestate]');
+  if (s) s.textContent = text;
+}
+
+const saveTimers = {}, pendingSaves = {};
+function runSave(ev) {
+  delete pendingSaves[ev.id];
+  clearTimeout(saveTimers[ev.id]);
+  Store.saveEvent(ev).then(() => setSave('Tersimpan')).catch(e => setStatus(saveError(e), true));
+}
+function queueSave(ev) {
+  if (ev.example) return;
+  clearTimeout(saveTimers[ev.id]);
+  setSave('Menyimpan…');
+  pendingSaves[ev.id] = ev;
+  saveTimers[ev.id] = setTimeout(() => runSave(ev), 800);
+}
+function flushSaves() { Object.values(pendingSaves).forEach(runSave); }
+
+/* ---------- Data shapes ---------- */
+
+const newRow = (type, label) => ({ id: newId(), type, label, val: '' });
+const newLeg = (from = 'Home', to = '', mode = 'Car') => ({
+  id: newId(), from, to, mode, km: '', fare: '', images: [],
+  rows: [newRow('toll', 'Toll'), newRow('parking', 'Parkir')],
+});
+const newEvent = date => ({ id: newId(), kind: 'Wedding', client: '', venue: '', date, rate: settings.rate, legs: [newLeg()] });
+
+function exampleEvent() {
+  const ev = newEvent(`${viewMonth}-03`);
+  Object.assign(ev, { example: true, client: 'Contoh: Budi & Sari', venue: 'Hotel Contoh', rate: DEFAULT_RATE });
+  const a = ev.legs[0];
+  Object.assign(a, { to: 'Gereja Contoh', km: '17' });
+  a.rows[0].val = '8500'; a.rows[1].val = '20000';
+  const b = newLeg('Gereja Contoh', 'Hotel Contoh', 'Car');
+  b.km = '9'; b.rows[1].val = '40000';
+  const c = newLeg('Hotel Contoh', 'Home', 'Green SM');
+  c.fare = '99500'; c.rows[0].val = '8500';
+  ev.legs.push(b, c);
+  return ev;
+}
+
+/* ---------- Rendering ---------- */
+
+const MONTHS_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+const ic = name => `<svg class="ic"><use href="#i-${name}"/></svg>`;
+let view = 'home', openId = null, pdfBusy = false, booted = false;
+
+const inMonth = () => events.filter(e => (e.date || '').startsWith(viewMonth)).sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+const findEv = el => events.find(e => e.id === el.closest('[data-ev]')?.dataset.ev);
+const findLeg = (ev, el) => ev?.legs.find(l => l.id === el.closest('[data-leg]')?.dataset.leg);
+const findRow = (leg, el) => leg?.rows.find(r => r.id === el.closest('[data-row]')?.dataset.row);
+const monthLabel = () => { const [y, m] = viewMonth.split('-'); return `${MONTHS_ID[+m - 1]} ${y}`; };
+const missingProof = ev => ev.legs.filter(l => !l.images.length).length;
+
+// A dropdown whose last option reveals a free-text box; any value outside the list counts as free text.
+function pickerHtml(id, label, options, value, field, attr) {
+  const custom = !options.includes(value);
+  const opts = options.map(o => `<option${o === value ? ' selected' : ''}>${esc(o)}</option>`).join('');
+  return `<div class="stack"><label class="f">${label}<select id="${id}" data-pick="${field}">${opts}<option value="${OTHER}"${custom ? ' selected' : ''}>Lainnya (tulis sendiri)</option></select></label>
+    ${custom ? `<input id="${id}-text" ${attr}="${field}" value="${esc(value)}" aria-label="${label}, tulis sendiri">` : ''}</div>`;
+}
+
+function rowHtml(row) {
+  const label = row.type === 'other'
+    ? `<input id="r-l-${row.id}" data-f="label" value="${esc(row.label)}" aria-label="Nama biaya">`
+    : `<span>${esc(row.label)}</span>`;
+  return `<div class="row" data-row="${row.id}">${label}
+    <input id="r-v-${row.id}" data-f="val" value="${esc(row.val)}" aria-label="${esc(row.label)}">
+    <span class="val" data-rowval></span>
+    <button data-act="del-row" aria-label="Hapus ${esc(row.label)}" title="Hapus">${ic('x')}</button></div>`;
+}
+
+function legHtml(ev, leg, i) {
+  const thumbs = leg.images.map((im, n) => `<div class="thumb"><img src="${esc(Store.url(im))}" data-proof="${esc(im)}" alt="Bukti ${n + 1}">
+    <button data-act="del-img" data-img="${esc(im)}" aria-label="Hapus bukti ${n + 1}" title="Hapus">${ic('x')}</button>${n === 0 ? '<span>Utama</span>' : ''}</div>`).join('');
+  return `<section class="card" data-leg="${leg.id}">
+    <div class="leg-head">
+      <span class="tag">Rute ${i + 1}</span>
+      ${leg.images.length ? '' : '<span class="chip">Belum ada bukti</span>'}
+      ${ev.legs.length > 1 ? '<button class="quiet" data-act="del-leg">Hapus rute</button>' : ''}
+    </div>
+    <div class="stops">
+      <div class="stop"><span class="mark"><span class="ring"></span></span>
+        <label class="f">Dari<input id="l-from-${leg.id}" data-f="from" value="${esc(leg.from)}"></label></div>
+      <div class="stop"><span class="mark"><svg class="pin"><use href="#i-pin"/></svg></span>
+        <label class="f">Ke<input id="l-to-${leg.id}" data-f="to" value="${esc(leg.to)}"></label></div>
+    </div>
+    <div class="two">
+      ${pickerHtml(`l-mode-${leg.id}`, 'Transport', MODES, leg.mode, 'mode', 'data-f')}
+      <label class="f" data-kmwrap>Jarak (km)<input id="l-km-${leg.id}" data-f="km" inputmode="decimal" value="${esc(leg.km)}"></label>
+      <label class="f" data-farewrap>Harga di invoice (Rp)<input id="l-fare-${leg.id}" data-f="fare" value="${esc(leg.fare)}"></label>
+    </div>
+    <div class="fare-line" data-carline><span data-faretext></span><b data-fare></b></div>
+    ${leg.rows.map(rowHtml).join('')}
+    <div class="adders">
+      <button class="pill" data-act="add-row" data-type="toll" data-label="Toll">+ Toll</button>
+      <button class="pill" data-act="add-row" data-type="parking" data-label="Parkir">+ Parkir</button>
+      <button class="pill" data-act="add-row" data-type="other" data-label="Biaya lain">+ Biaya lain</button>
+    </div>
+    <div class="total"><span>Total rute</span><b data-legtotal></b></div>
+    <div class="proof" data-drop>
+      <h4>Bukti perjalanan</h4>
+      ${thumbs ? `<div class="thumbs">${thumbs}</div>` : ''}
+      <p>Screenshot Google Maps atau invoice taxi online. Gambar pertama jadi bukti utama, sisanya (mis. struk parkir) tampil di bawah total pada PDF.<span class="desk-only"> Bisa juga seret file ke sini atau tempel dengan ⌘V.</span></p>
+      <label class="pill add-proof">${ic('image')}Pilih gambar<input id="l-file-${leg.id}" type="file" accept="image/*" multiple data-file aria-label="Pilih gambar bukti"></label>
+    </div>
+  </section>`;
+}
+
+function detailHtml(ev) {
+  return `<div data-ev="${ev.id}">
+    <header class="hero small gut">
+      <div class="hero-top">
+        <button class="round" data-act="done" aria-label="Kembali ke daftar klaim">${ic('back')}</button>
+        <div><small data-savestate class="save-state">Detail klaim</small><h1 data-title></h1></div>
+        <button class="round" data-act="del-ev" aria-label="Hapus klaim" title="Hapus klaim">${ic('trash')}</button>
+      </div>
+    </header>
+    <div class="lift gut">
+      <section class="card">
+        ${pickerHtml(`e-kind-${ev.id}`, 'Keterangan', KINDS, ev.kind, 'kind', 'data-e')}
+        <label class="f">Nama client<input id="e-client-${ev.id}" data-e="client" value="${esc(ev.client)}"></label>
+        <label class="f">Lokasi (opsional)<input id="e-venue-${ev.id}" data-e="venue" value="${esc(ev.venue)}"></label>
+        <label class="f">Tanggal<input id="e-date-${ev.id}" type="date" data-e="date" value="${esc(ev.date)}"></label>
+      </section>
+      ${ev.legs.map((l, i) => legHtml(ev, l, i)).join('')}
+      <div class="add-routes">
+        <button class="pill" data-act="add-leg">+ Tambah rute</button>
+        <button class="pill" data-act="home-leg">+ Rute pulang</button>
+      </div>
+    </div>
+    <div class="donebar">
+      <div><small>Total klaim ini</small><b data-evtotal></b></div>
+      <button class="cta" data-act="done">Selesai</button>
+    </div>
+  </div>`;
+}
+
+function claimHtml(ev) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ev.date || ''), missing = missingProof(ev);
+  return `<button class="claim" data-open="${ev.id}">
+    <span class="date-tile"><b>${m ? +m[3] : '-'}</b><span>${m ? MONTHS[+m[2] - 1] : ''}</span></span>
+    <span class="claim-main">
+      <span class="kind">${esc(ev.kind || 'Klaim')}</span>
+      <b>${esc(ev.client || 'Tanpa nama client')}</b>
+      <small>${ev.legs.length} rute${ev.venue ? ' · ' + esc(ev.venue) : ''}</small>
+      ${missing ? `<span class="chip">${missing} belum ada bukti</span>` : ''}
+    </span>
+    <span class="claim-amt">${esc(rupiah(eventTotal(ev)))}</span>
+  </button>`;
+}
+
+function render() {
+  const list = inMonth();
+  document.querySelectorAll('[data-month]').forEach(el => { el.textContent = monthLabel(); });
+  $('example-note').hidden = !showingExample;
+  $('claim-count').textContent = list.length ? `${list.length} client` : '';
+  $('claims').innerHTML = list.length ? list.map(claimHtml).join('')
+    : `<div class="card empty"><span class="tile">${ic('car')}</span><b>Belum ada klaim di bulan ini</b><span>Tekan tombol + di bawah untuk mulai.</span></div>`;
+  $('summary-list').innerHTML = list.length ? list.map(ev => `<button class="sum-row" data-open="${ev.id}">
+      <b>${esc([ev.kind, ev.client].filter(Boolean).join(' - ') || 'Klaim')}</b>
+      <span class="amt">${esc(rupiah(eventTotal(ev)))}</span>
+      <small>${esc(fmtDate(ev.date))} · ${ev.legs.length} rute</small></button>`).join('')
+    : '<p class="note">Belum ada klaim di bulan ini.</p>';
+  const open = view === 'detail' && events.find(e => e.id === openId);
+  $('list').innerHTML = open ? detailHtml(open) : '';
+  recalc();
+}
+
+// Refreshes computed figures in place so typing never loses focus.
+function recalc() {
+  for (const card of $('list').querySelectorAll('[data-ev]')) {
+    const ev = events.find(e => e.id === card.dataset.ev);
+    if (!ev) continue;
+    card.querySelector('[data-title]').textContent = ev.client || 'Klaim baru';
+    for (const legEl of card.querySelectorAll('[data-leg]')) {
+      const leg = ev.legs.find(l => l.id === legEl.dataset.leg);
+      const car = isCar(leg);
+      legEl.querySelector('[data-kmwrap]').hidden = !car;
+      legEl.querySelector('[data-farewrap]').hidden = car;
+      legEl.querySelector('[data-carline]').hidden = !car;
+      legEl.querySelector('[data-faretext]').textContent = `${leg.km || 0} km × ${rupiah(ev.rate)}`;
+      legEl.querySelector('[data-fare]').textContent = rupiah(legFare(ev, leg));
+      legEl.querySelector('[data-f="fare"]').classList.toggle('bad', parseParts(leg.fare, ev.rate) === null);
+      legEl.querySelector('[data-legtotal]').textContent = rupiah(legTotal(ev, leg));
+      for (const rowEl of legEl.querySelectorAll('[data-row]')) {
+        const row = leg.rows.find(r => r.id === rowEl.dataset.row);
+        rowEl.querySelector('[data-f="val"]').classList.toggle('bad', parseParts(row.val, ev.rate) === null);
+        rowEl.querySelector('[data-rowval]').textContent = rupiah(rowAmount(ev, row)).replace('Rp -', '-Rp ');
+      }
+    }
+    card.querySelector('[data-evtotal]').textContent = rupiah(eventTotal(ev));
+  }
+  const list = inMonth(), legs = list.flatMap(e => e.legs), missing = legs.filter(l => !l.images.length).length;
+  const total = rupiah(list.reduce((a, e) => a + eventTotal(e), 0));
+  $('grand').textContent = total;
+  $('summary-total').textContent = total;
+  $('grand-note').textContent = `${list.length} client, ${legs.length} rute`;
+  $('missing-note').hidden = !missing || showingExample;
+  $('missing-text').textContent = `${missing} rute belum ada bukti. Lengkapi sebelum mengunduh PDF.`;
+}
+
+function show(next) {
+  view = next;
+  for (const v of ['home', 'detail', 'summary', 'settings']) $(`view-${v}`).hidden = v !== view;
+  $('nav').hidden = view === 'detail';
+  document.querySelectorAll('.tab[data-go]').forEach(t => t.classList.toggle('on', t.dataset.go === view));
+  render();
+  window.scrollTo(0, 0);
+}
+
+function openClaim(id) {
+  openId = id;
+  show('detail');
+  const ev = events.find(e => e.id === id);
+  Store.prepare(ev.legs.flatMap(l => l.images)).then(() => {
+    document.querySelectorAll('[data-proof]').forEach(img => { img.src = Store.url(img.dataset.proof); });
+  });
+}
+
+function shiftMonth(delta) {
+  const [y, m] = viewMonth.split('-').map(Number), d = new Date(y, m - 1 + delta, 1);
+  viewMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  render();
+}
+
+/* ---------- Interactions ---------- */
+
+const clearExample = () => { if (showingExample) { events = events.filter(e => !e.example); showingExample = false; } };
+
+// Delete actions take two taps because the viewer has no confirm dialog.
+function armed(btn) {
+  if (btn.dataset.armed) return true;
+  const old = btn.innerHTML;
+  btn.dataset.armed = '1';
+  btn.classList.add('armed');
+  btn.textContent = 'Yakin?';
+  setTimeout(() => { if (btn.isConnected) { delete btn.dataset.armed; btn.classList.remove('armed'); btn.innerHTML = old; } }, 3500);
+  return false;
+}
+
+function dropImages(ev, ids) {
+  if (!ev.example) ids.forEach(id => Store.deleteImage(id).catch(() => {}));
+}
+
+document.addEventListener('click', e => {
+  const go = e.target.closest('[data-go]');
+  if (go) { show(go.dataset.go); return; }
+  const open = e.target.closest('[data-open]');
+  if (open) openClaim(open.dataset.open);
+});
+$('prev-month').addEventListener('click', () => shiftMonth(-1));
+$('next-month').addEventListener('click', () => shiftMonth(1));
+
+$('list').addEventListener('input', e => {
+  const t = e.target, ev = findEv(t);
+  if (!ev) return;
+  if (t.dataset.pick) {
+    const target = t.dataset.pick === 'kind' ? ev : findLeg(ev, t), custom = t.value === OTHER, id = t.id;
+    target[t.dataset.pick] = custom ? '' : t.value;
+    render();
+    queueSave(ev);
+    $(custom ? `${id}-text` : id).focus();
+    return;
+  }
+  if (t.dataset.e) ev[t.dataset.e] = t.value;
+  else if (t.dataset.f) {
+    const leg = findLeg(ev, t), row = findRow(leg, t);
+    if (row) row[t.dataset.f] = t.value;
+    else if (leg) leg[t.dataset.f] = t.value;
+  } else return;
+  recalc();
+  queueSave(ev);
+});
+
+$('list').addEventListener('change', e => {
+  const t = e.target, ev = findEv(t);
+  if (t.dataset.e === 'date' && ev && t.value && !t.value.startsWith(viewMonth)) {
+    viewMonth = t.value.slice(0, 7);
+    render();
+  }
+  if (t.dataset.file !== undefined && ev) { addImages(ev, findLeg(ev, t), t.files); t.value = ''; }
+});
+
+$('list').addEventListener('click', async e => {
+  const btn = e.target.closest('button[data-act]');
+  if (!btn) return;
+  const ev = findEv(btn), leg = findLeg(ev, btn), act = btn.dataset.act;
+  let focusId = null;
+  if (act === 'done') { show('home'); return; }
+  if (act === 'add-row') leg.rows.push(newRow(btn.dataset.type, btn.dataset.label));
+  else if (act === 'del-row') leg.rows = leg.rows.filter(r => r !== findRow(leg, btn));
+  else if (act === 'add-leg') {
+    // Each new route continues from where the previous one ended.
+    const last = ev.legs[ev.legs.length - 1], next = newLeg(last.to, '', last.mode);
+    ev.legs.push(next);
+    focusId = `l-to-${next.id}`;
+  } else if (act === 'home-leg') {
+    const first = ev.legs[0], last = ev.legs[ev.legs.length - 1], back = newLeg(last.to, first.from, last.mode);
+    back.rows = first.rows.filter(r => r.type === 'toll').map(r => ({ ...r, id: newId() }));
+    back.rows.push(newRow('parking', 'Parkir'));
+    ev.legs.push(back);
+    focusId = isCar(back) ? `l-km-${back.id}` : `l-fare-${back.id}`;
+  } else if (act === 'del-img') {
+    if (!armed(btn)) return;
+    leg.images = leg.images.filter(i => i !== btn.dataset.img);
+    dropImages(ev, [btn.dataset.img]);
+  } else if (act === 'del-leg') {
+    if (!armed(btn)) return;
+    dropImages(ev, leg.images);
+    ev.legs = ev.legs.filter(l => l !== leg);
+  } else if (act === 'del-ev') {
+    if (!armed(btn)) return;
+    dropImages(ev, ev.legs.flatMap(l => l.images));
+    events = events.filter(x => x !== ev);
+    if (ev.example) showingExample = false;
+    else {
+      clearTimeout(saveTimers[ev.id]);
+      delete pendingSaves[ev.id];
+      Store.deleteEvent(ev.id).then(() => setStatus('Klaim dihapus')).catch(() => setStatus('Gagal menghapus. Periksa koneksi Anda, lalu coba lagi.', true));
+    }
+    show('home');
+    return;
+  }
+  render();
+  queueSave(ev);
+  if (focusId) {
+    $(focusId).focus();
+    $(focusId).closest('[data-leg]').scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }
+});
+
+// Shrinks each screenshot so the PDF stays small; the old monthly PDFs reached 26 MB.
+async function compress(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await loadImage(url);
+    const scale = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.naturalWidth * scale);
+    c.height = Math.round(img.naturalHeight * scale);
+    const g = c.getContext('2d');
+    g.fillStyle = '#fff';
+    g.fillRect(0, 0, c.width, c.height);
+    g.drawImage(img, 0, 0, c.width, c.height);
+    return await new Promise(res => c.toBlob(res, 'image/jpeg', 0.85));
+  } finally { URL.revokeObjectURL(url); }
+}
+
+function loadImage(src) {
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res(img);
+    img.onerror = () => rej(new Error('image'));
+    img.src = src;
+  });
+}
+
+async function addImages(ev, leg, files) {
+  const list = [...files].filter(f => f.type.startsWith('image/') || /\.(heic|heif)$/i.test(f.name));
+  if (!list.length) { setStatus('File itu bukan gambar. Gunakan PNG atau JPG.', true); return; }
+  if (ev.example) { clearExample(); setStatus('Tekan tombol + dulu, lalu lampirkan bukti pada klaim Anda.', true); show('home'); return; }
+  setStatus(`Mengunggah ${list.length} gambar…`);
+  let unreadable = 0, uploadError = null;
+  for (const f of list) {
+    let blob;
+    try { blob = await compress(f); } catch (e) { unreadable++; continue; }
+    try { leg.images.push(await Store.putImage(blob)); } catch (e) { uploadError = e; }
+  }
+  render();
+  await Store.saveEvent(ev).catch(e => { uploadError = e; });
+  if (uploadError) setStatus(saveError(uploadError), true);
+  else if (unreadable) setStatus(`${unreadable} gambar gagal dibaca. Foto HEIC dari iPhone perlu diubah ke JPG atau PNG dulu.`, true);
+  else setStatus('Bukti tersimpan di Google Drive');
+}
+
+let activeProof = null;
+$('list').addEventListener('focusin', e => { activeProof = e.target.closest('[data-leg]')?.dataset.leg || activeProof; });
+$('list').addEventListener('pointerdown', e => { activeProof = e.target.closest('[data-leg]')?.dataset.leg || activeProof; });
+for (const type of ['dragover', 'dragleave', 'drop']) {
+  $('list').addEventListener(type, e => {
+    const zone = e.target.closest('[data-drop]');
+    if (!zone) return;
+    e.preventDefault();
+    zone.classList.toggle('drag', type === 'dragover');
+    if (type === 'drop') { const ev = findEv(zone); addImages(ev, findLeg(ev, zone), e.dataTransfer.files); }
+  });
+}
+document.addEventListener('paste', e => {
+  const files = [...(e.clipboardData?.files || [])];
+  if (!files.length || !activeProof || view !== 'detail') return;
+  const ev = events.find(x => x.legs.some(l => l.id === activeProof));
+  if (ev) { e.preventDefault(); addImages(ev, ev.legs.find(l => l.id === activeProof), files); }
+});
+
+$('add').addEventListener('click', () => {
+  if (!booted) { setStatus('Data masih dimuat. Coba lagi sebentar.'); return; }
+  clearExample();
+  const now = new Date(), today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const ev = newEvent(today.startsWith(viewMonth) ? today : `${viewMonth}-01`);
+  events.push(ev);
+  openClaim(ev.id);
+  queueSave(ev);
+  $(`e-client-${ev.id}`).focus();
+});
+
+function saveSettings() { Store.saveSettings(settings).catch(() => setStatus('Gagal menyimpan pengaturan.', true)); }
+$('rate').addEventListener('change', () => {
+  const r = sum(parseParts($('rate').value, 0));
+  if (r > 0) {
+    settings.rate = r;
+    saveSettings();
+    setStatus(`Tarif ${rupiah(r)} per km berlaku untuk klaim baru.`);
+  }
+  $('rate').value = settings.rate;
+});
+$('summary').addEventListener('change', () => { settings.summary = $('summary').checked; saveSettings(); });
+$('pdf').addEventListener('click', () => downloadPdf());
+$('pdf2').addEventListener('click', () => downloadPdf());
+
+/* ---------- PDF, laid out like the existing Claim Transport documents ---------- */
+
+const A4 = { w: 595, h: 842 }, MARGIN = 36, SLOT = { top: 84, h: 364, card: 352 };
+const INK = [23, 34, 43], MUTED = [90, 104, 115], LINE = [212, 219, 224], ACCENT = [140, 28, 28], TINT = [248, 241, 240], SOFT = [244, 246, 248];
+const pen = (doc, style, size, color = INK) => { doc.setFont('helvetica', style); doc.setFontSize(size); doc.setTextColor(...color); };
+
+async function imageData(id) {
+  const img = await loadImage(Store.url(id));
+  const c = document.createElement('canvas');
+  c.width = img.naturalWidth; c.height = img.naturalHeight;
+  c.getContext('2d').drawImage(img, 0, 0);
+  return { data: c.toDataURL('image/jpeg', 0.88), w: c.width, h: c.height };
+}
+
+function drawFit(doc, im, x, y, boxW, boxH, center) {
+  const k = Math.min(boxW / im.w, boxH / im.h), w = im.w * k, h = im.h * k;
+  const ix = center ? x + (boxW - w) / 2 : x, iy = center ? y + (boxH - h) / 2 : y;
+  doc.addImage(im.data, 'JPEG', ix, iy, w, h, undefined, 'FAST');
+  doc.setDrawColor(...LINE); doc.setLineWidth(0.5);
+  doc.rect(ix, iy, w, h, 'S');
+}
+
+function pdfRows(ev, leg) {
+  const rows = [{ label: isCar(leg) ? `Harga (${leg.km || 0} km x ${rupiah(ev.rate)})` : 'Harga', amount: legFare(ev, leg) }];
+  for (const r of leg.rows) {
+    const parts = parseParts(r.val, ev.rate);
+    if (!parts || !sum(parts)) continue;
+    const name = r.label || 'Biaya lain';
+    rows.push({
+      label: parts.length > 1 ? `${name} (${parts.map(p => p.toLocaleString('en-US')).join(' + ')})` : name,
+      amount: sum(parts) * (r.type === 'promo' ? -1 : 1),
+    });
+  }
+  return rows;
+}
+
+const money = n => (n < 0 ? '- ' : '') + rupiah(Math.abs(n));
+
+function drawRoute(doc, leg, x, y, width) {
+  const stops = [leg.from || '-', leg.to || '-'];
+  pen(doc, 'bold', 10.5);
+  const lines = stops.map(s => doc.splitTextToSize(s, width - 14));
+  const secondY = y + lines[0].length * 13 + 5;
+  doc.setDrawColor(...MUTED); doc.setLineWidth(0.8);
+  doc.line(x + 3, y - 3, x + 3, secondY - 3);
+  doc.setFillColor(255, 255, 255); doc.circle(x + 3, y - 3.5, 2.6, 'FD');
+  doc.setFillColor(...ACCENT); doc.setDrawColor(...ACCENT); doc.circle(x + 3, secondY - 3.5, 2.6, 'FD');
+  lines[0].forEach((l, i) => doc.text(l, x + 14, y + i * 13));
+  lines[1].forEach((l, i) => doc.text(l, x + 14, secondY + i * 13));
+  return secondY + (lines[1].length - 1) * 13;
+}
+
+async function drawLeg(doc, ev, leg, top, index) {
+  const left = MARGIN, w = A4.w - MARGIN * 2, h = SLOT.card, right = left + w - 14;
+  const box = { x: left + 12, y: top + 12, w: 178, h: h - 24 };
+  const x = box.x + box.w + 18, width = right - x;
+  doc.setDrawColor(...LINE); doc.setLineWidth(0.7);
+  doc.roundedRect(left, top, w, h, 5, 5, 'S');
+  doc.setFillColor(...SOFT);
+  doc.rect(box.x, box.y, box.w, box.h, 'F');
+
+  let y = top + 26;
+  pen(doc, 'bold', 8.5, ACCENT);
+  doc.setCharSpace(0.6);
+  doc.text((ev.kind || 'Klaim').toUpperCase(), x, y);
+  doc.setCharSpace(0);
+  if (ev.legs.length > 1) {
+    pen(doc, 'normal', 8.5, MUTED);
+    doc.text(`Rute ${index + 1} dari ${ev.legs.length}`, right, y, { align: 'right' });
+  }
+  y += 19;
+  pen(doc, 'bold', 15);
+  for (const l of doc.splitTextToSize(ev.client || '-', width)) { doc.text(l, x, y); y += 18; }
+  y -= 3;
+  pen(doc, 'normal', 10, MUTED);
+  for (const l of doc.splitTextToSize([fmtDate(ev.date), ev.venue].filter(Boolean).join('  |  '), width)) { doc.text(l, x, y); y += 13; }
+
+  y += 7;
+  doc.setDrawColor(...LINE); doc.setLineWidth(0.5);
+  doc.line(x, y - 5, right, y - 5);
+  y += 11;
+  pen(doc, 'bold', 8.5);
+  const mode = leg.mode || '-', pillW = Math.min(doc.getTextWidth(mode) + 14, width / 2.5);
+  doc.setFillColor(...SOFT);
+  doc.roundedRect(right - pillW, y - 11, pillW, 16, 3, 3, 'F');
+  pen(doc, 'bold', 8.5, MUTED);
+  doc.text(doc.splitTextToSize(mode, pillW - 8)[0], right - pillW / 2, y, { align: 'center' });
+  y = drawRoute(doc, leg, x, y, width - pillW - 8) + 22;
+
+  for (const r of pdfRows(ev, leg)) {
+    pen(doc, 'normal', 9.5);
+    const lines = doc.splitTextToSize(r.label, width - 84);
+    lines.forEach((l, i) => doc.text(l, x, y + i * 11.5));
+    doc.text(money(r.amount), right, y, { align: 'right' });
+    y += (lines.length - 1) * 11.5 + 5;
+    doc.setDrawColor(...LINE); doc.setLineWidth(0.4);
+    doc.line(x, y, right, y);
+    y += 12;
+  }
+  y -= 8;
+  doc.setFillColor(...TINT);
+  doc.roundedRect(x, y, width, 25, 3, 3, 'F');
+  pen(doc, 'bold', 10);
+  doc.text('Total', x + 9, y + 16.5);
+  pen(doc, 'bold', 12.5, ACCENT);
+  doc.text(money(legTotal(ev, leg)), right - 9, y + 17, { align: 'right' });
+  y += 25;
+
+  // Extra proofs sit under the total; when the costs leave no room they share the left column, so none is lost.
+  const images = await Promise.all(leg.images.map(imageData)), rest = images.slice(1), bottom = top + h - 12;
+  const roomBelow = bottom - y - 22;
+  if (rest.length && roomBelow >= 56) {
+    pen(doc, 'bold', 7.5, MUTED);
+    doc.text('BUKTI TAMBAHAN', x, y + 15);
+    const top2 = y + 22, cols = Math.min(rest.length, 3), rowsN = Math.ceil(rest.length / cols), gap = 8;
+    const cellW = (width - gap * (cols - 1)) / cols, cellH = (roomBelow - gap * (rowsN - 1)) / rowsN;
+    rest.forEach((im, i) => drawFit(doc, im, x + (i % cols) * (cellW + gap), top2 + Math.floor(i / cols) * (cellH + gap), cellW, cellH));
+    drawFit(doc, images[0], box.x, box.y, box.w, box.h, true);
+  } else if (images.length) {
+    const gap = 6, cellH = (box.h - gap * (images.length - 1)) / images.length;
+    images.forEach((im, i) => drawFit(doc, im, box.x, box.y + i * (cellH + gap), box.w, cellH, true));
+  } else {
+    pen(doc, 'normal', 9.5, MUTED);
+    doc.text('Belum ada bukti', box.x + box.w / 2, box.y + box.h / 2, { align: 'center' });
+  }
+}
+
+function pageHeader(doc, period) {
+  pen(doc, 'bold', 19);
+  doc.text('Claim Transport', MARGIN, 52);
+  pen(doc, 'normal', 8.5, MUTED);
+  doc.text('PERIODE', A4.w - MARGIN, 39, { align: 'right' });
+  pen(doc, 'bold', 12);
+  doc.text(period, A4.w - MARGIN, 53, { align: 'right' });
+  if (settings.name) {
+    const nameRight = A4.w - MARGIN - 80;
+    pen(doc, 'normal', 8.5, MUTED);
+    doc.text('DIAJUKAN OLEH', nameRight, 39, { align: 'right' });
+    pen(doc, 'bold', 12);
+    doc.text(doc.splitTextToSize(settings.name, 210)[0], nameRight, 53, { align: 'right' });
+  }
+  doc.setFillColor(...ACCENT);
+  doc.rect(MARGIN, 63, A4.w - MARGIN * 2, 2, 'F');
+}
+
+function drawSummary(doc, list, period) {
+  doc.addPage();
+  pageHeader(doc, period);
+  const left = MARGIN, right = A4.w - MARGIN, cDate = left + 10, cName = left + 84, cLegs = right - 110, cAmt = right - 10;
+  const tableHead = y => {
+    doc.setFillColor(...INK);
+    doc.rect(left, y, right - left, 24, 'F');
+    pen(doc, 'bold', 9, [255, 255, 255]);
+    doc.text('Tanggal', cDate, y + 15.5);
+    doc.text('Keterangan', cName, y + 15.5);
+    doc.text('Rute', cLegs, y + 15.5, { align: 'right' });
+    doc.text('Jumlah', cAmt, y + 15.5, { align: 'right' });
+    return y + 24;
+  };
+  pen(doc, 'bold', 13);
+  doc.text('Ringkasan', left, 94);
+  let y = tableHead(106);
+  list.forEach(ev => {
+    pen(doc, 'normal', 10);
+    const names = doc.splitTextToSize([ev.kind, ev.client, ev.venue].filter(Boolean).join(' - '), cLegs - cName - 40);
+    const rowH = names.length * 13 + 11;
+    if (y + rowH > A4.h - 90) {
+      doc.addPage();
+      pageHeader(doc, period);
+      y = tableHead(84);
+      pen(doc, 'normal', 10);
+    }
+    doc.text(fmtDate(ev.date), cDate, y + 16);
+    names.forEach((l, i) => doc.text(l, cName, y + 16 + i * 13));
+    doc.text(String(ev.legs.length), cLegs, y + 16, { align: 'right' });
+    doc.text(money(eventTotal(ev)), cAmt, y + 16, { align: 'right' });
+    y += rowH;
+    doc.setDrawColor(...LINE); doc.setLineWidth(0.4);
+    doc.line(left, y, right, y);
+  });
+  y += 8;
+  doc.setFillColor(...TINT);
+  doc.roundedRect(left, y, right - left, 32, 3, 3, 'F');
+  pen(doc, 'bold', 11);
+  doc.text('Total klaim', cDate, y + 20.5);
+  pen(doc, 'bold', 14, ACCENT);
+  doc.text(money(list.reduce((a, e) => a + eventTotal(e), 0)), cAmt, y + 21, { align: 'right' });
+}
+
+// Two routes per page; a claim's routes stay together when they fit on one page.
+async function buildPdf(list, withSummary) {
+  const doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'a4', compress: true });
+  const [yr, mo] = viewMonth.split('-'), period = `${MONTHS[+mo - 1]} ${yr}`;
+  let slot = 0, started = false;
+  for (const ev of list) {
+    if (slot === 1 && ev.legs.length > 1) slot = 2;
+    for (const [i, leg] of ev.legs.entries()) {
+      if (!started || slot >= 2) {
+        if (started) doc.addPage();
+        pageHeader(doc, period);
+        started = true;
+        slot = 0;
+      }
+      await drawLeg(doc, ev, leg, SLOT.top + slot * SLOT.h, i);
+      slot++;
+    }
+  }
+  if (withSummary) drawSummary(doc, list, period);
+  const pages = doc.getNumberOfPages();
+  for (let p = 1; p <= pages; p++) {
+    doc.setPage(p);
+    pen(doc, 'normal', 8, MUTED);
+    doc.text(`Claim Transport - ${period}`, MARGIN, 822);
+    doc.text(`Halaman ${p} dari ${pages}`, A4.w - MARGIN, 822, { align: 'right' });
+  }
+  return doc;
+}
+
+async function downloadPdf() {
+  if (pdfBusy) return;
+  const list = inMonth();
+  if (!list.length) { setStatus('Belum ada klaim di bulan ini, jadi belum ada PDF yang bisa dibuat.', true); return; }
+  if (!window.jspdf) { setStatus('Pembuat PDF belum termuat. Periksa koneksi internet, lalu muat ulang halaman.', true); return; }
+  pdfBusy = true;
+  setStatus('Membuat PDF…');
+  try {
+    await Store.prepare(list.flatMap(ev => ev.legs.flatMap(l => l.images)));
+    const doc = await buildPdf(list, $('summary').checked);
+    const [y, m] = viewMonth.split('-');
+    const filename = `Claim Transport - ${MONTHS[+m - 1]} ${y.slice(2)}.pdf`, blob = doc.output('blob');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+    const copied = await Drive.enqueue('pdf', () => Drive.upload(filename, blob, 'application/pdf')).then(() => true, () => false);
+    setStatus(copied ? `${filename} diunduh dan disimpan di Google Drive` : `${filename} diunduh, tetapi salinannya gagal disimpan di Google Drive.`, !copied);
+  } catch (e) {
+    setStatus('PDF gagal dibuat. Salah satu bukti mungkin tidak terbaca; coba unggah ulang gambarnya.', true);
+  } finally { pdfBusy = false; }
+}
+
+/* ---------- Account and start ---------- */
+
+$('signin').addEventListener('click', () => Auth.signIn());
+
+$('signout').addEventListener('click', async () => {
+  flushSaves();
+  setStatus('Menyimpan sebelum keluar…');
+  await Drive.idle();
+  Auth.drop();
+  try { localStorage.removeItem('ct-email'); } catch (e) {}
+  location.reload();
+});
+
+$('employee').addEventListener('change', () => {
+  settings.name = $('employee').value.trim() || Auth.profile?.name || '';
+  $('employee').value = settings.name;
+  saveSettings();
+  setStatus('Nama di PDF disimpan');
+});
+
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushSaves(); });
+
+function waitForGoogle() {
+  return new Promise(res => {
+    const started = Date.now();
+    (function check() {
+      if (window.google?.accounts?.oauth2) res(true);
+      else if (Date.now() - started > 15000) res(false);
+      else setTimeout(check, 100);
+    })();
+  });
+}
+
+async function boot() {
+  const now = new Date();
+  viewMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  document.querySelectorAll('[data-month]').forEach(el => { el.textContent = monthLabel(); });
+  $('rate').value = settings.rate;
+
+  const clientId = window.CLAIM_CONFIG?.googleClientId || '';
+  if (!clientId || clientId.includes('TEMPEL')) {
+    loginMessage('Aplikasi belum dihubungkan ke Google. Admin perlu mengisi Client ID di file config.js sesuai PANDUAN.md.');
+    $('signin').hidden = true;
+    return;
+  }
+  if (!await waitForGoogle()) {
+    loginMessage('Layanan login Google tidak termuat. Periksa koneksi internet, lalu muat ulang halaman.');
+    $('signin').hidden = true;
+    return;
+  }
+  Auth.init(clientId);
+
+  try {
+    await Auth.ensure();
+    Auth.profile = await (await api('https://www.googleapis.com/oauth2/v3/userinfo')).json();
+    try { localStorage.setItem('ct-email', Auth.profile.email || ''); } catch (e) {}
+    await Drive.init();
+    const saved = await Store.loadSettings();
+    if (saved) settings = { ...settings, ...saved };
+    events = await Store.loadEvents();
+  } catch (e) {
+    $('claims').innerHTML = '<div class="card empty"><b>Data tidak bisa dimuat dari Google Drive</b><span>Periksa koneksi Anda, lalu muat ulang halaman ini.</span></div>';
+    setStatus('Data tidak bisa dimuat dari Google Drive.', true);
+    return;
+  }
+
+  if (!settings.name) settings.name = Auth.profile.name || '';
+  $('employee').value = settings.name;
+  $('account-email').textContent = Auth.profile.email || '';
+  $('drive-link').href = Drive.folderUrl();
+  const first = (settings.name || '').split(' ')[0];
+  $('greeting').textContent = first ? `Halo, ${first}` : 'Klaim perjalanan kerja';
+  $('rate').value = settings.rate;
+  $('summary').checked = settings.summary;
+  if (!events.length) { events = [exampleEvent()]; showingExample = true; }
+  else if (!inMonth().length) {
+    viewMonth = events.map(e => e.date || '').sort().pop().slice(0, 7) || viewMonth;
+  }
+  booted = true;
+  render();
+}
+boot();
+</script>
+</body>
+</html>
