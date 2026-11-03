@@ -119,6 +119,7 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .add-routes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .add-routes .pill { background: var(--surface); box-shadow: var(--shadow); min-height: 48px; border-radius: 16px; }
 .save-state { font-size: 12px; opacity: .9; }
+.save-route { justify-self: start; }
 
 /* Summary */
 .sum-row { width: 100%; text-align: left; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 11px 0; border-bottom: 1px solid var(--line); }
@@ -164,6 +165,7 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
   <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="m4 18 5-4 4 3 3-2 4 3"/></symbol>
   <symbol id="i-car" viewBox="0 0 24 24"><path d="M4 16v-3l2-6h12l2 6v3"/><path d="M3 13h18v4H3z"/><path d="M6 17v2M18 17v2"/></symbol>
   <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5" fill="#fff" stroke="none"/></symbol>
+  <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M8.5 19H16a3.5 3.5 0 0 0 0-7H8a3.5 3.5 0 0 1 0-7h7.5"/></symbol>
 </svg>
 
 <div class="app">
@@ -204,8 +206,21 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
       </div>
       <div class="card">
         <label class="check"><input type="checkbox" id="summary" checked>Include a summary page in the PDF</label>
-        <button class="cta" id="pdf2"><svg class="ic"><use href="#i-pdf"/></svg>Download PDF</button>
+        <button class="cta" id="pdf"><svg class="ic"><use href="#i-pdf"/></svg>Download PDF</button>
       </div>
+    </div>
+  </section>
+
+  <section id="view-routes" hidden>
+    <header class="hero small gut">
+      <div class="hero-top"><div><small>Claim Transport</small><h1>Routes</h1></div></div>
+    </header>
+    <div class="lift gut">
+      <div class="card">
+        <p class="note">Save the routes you use often, then pick one when filling in a claim. The distance and toll fill in for you.</p>
+        <button class="outline" id="add-route">+ New saved route</button>
+      </div>
+      <div class="claims" id="routes-list"></div>
     </div>
   </section>
 
@@ -238,7 +253,7 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
   <button class="tab on" data-go="home"><i><svg class="ic"><use href="#i-home"/></svg></i>Home</button>
   <button class="tab" data-go="summary"><i><svg class="ic"><use href="#i-list"/></svg></i>Summary</button>
   <button class="fab" id="add" aria-label="Add claim"><svg class="ic"><use href="#i-plus"/></svg></button>
-  <button class="tab" id="pdf"><i><svg class="ic"><use href="#i-pdf"/></svg></i>Download PDF</button>
+  <button class="tab" data-go="routes"><i><svg class="ic"><use href="#i-route"/></svg></i>Routes</button>
   <button class="tab" data-go="settings"><i><svg class="ic"><use href="#i-gear"/></svg></i>Settings</button>
 </nav>
 <div class="toast" id="status" role="status" hidden></div>
@@ -255,7 +270,7 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 const rupiah = n => 'Rp ' + Math.round(n).toLocaleString('en-US');
 
-let events = [], settings = { rate: DEFAULT_RATE, summary: true, name: '', lastBackup: '' }, viewMonth = '', showingExample = false;
+let events = [], settings = { rate: DEFAULT_RATE, summary: true, name: '', lastBackup: '', routes: [] }, viewMonth = '', showingExample = false;
 
 /* ---------- Amounts ---------- */
 
@@ -413,7 +428,28 @@ function rowHtml(row) {
     <button data-act="del-row" aria-label="Remove ${esc(row.label)}" title="Remove">${ic('x')}</button></div>`;
 }
 
+// Only routes with both stops can be picked on a claim.
+const readyRoutes = () => settings.routes.filter(r => r.from && r.to);
+
+function savedRouteHtml(r) {
+  return `<section class="card" data-route="${esc(r.id)}">
+    <div class="stops">
+      <div class="stop"><span class="mark"><span class="ring"></span></span>
+        <label class="f">From<input id="s-from-${esc(r.id)}" data-r="from" value="${esc(r.from)}"></label></div>
+      <div class="stop"><span class="mark"><svg class="pin"><use href="#i-pin"/></svg></span>
+        <label class="f">To<input id="s-to-${esc(r.id)}" data-r="to" value="${esc(r.to)}"></label></div>
+    </div>
+    <div class="two">
+      ${pickerHtml(`s-mode-${esc(r.id)}`, 'Transport', MODES, r.mode, 'mode', 'data-r')}
+      <label class="f" data-kmwrap${isCar(r) ? '' : ' hidden'}>Distance (km)<input id="s-km-${esc(r.id)}" data-r="km" inputmode="decimal" value="${esc(r.km)}"></label>
+      <label class="f">Toll (Rp)<input id="s-toll-${esc(r.id)}" data-r="toll" class="${parseParts(r.toll, 0) === null ? 'bad' : ''}" value="${esc(r.toll)}"></label>
+    </div>
+    <button class="quiet save-route" data-route-del>Remove</button>
+  </section>`;
+}
+
 function legHtml(ev, leg, i) {
+  const ready = readyRoutes();
   const thumbs = leg.images.map((im, n) => `<div class="thumb"><img src="${esc(Store.url(im))}" alt="Proof ${n + 1}">
     <button data-act="del-img" data-img="${esc(im)}" aria-label="Remove proof ${n + 1}" title="Remove">${ic('x')}</button>${n === 0 ? '<span>Main</span>' : ''}</div>`).join('');
   return `<section class="card" data-leg="${leg.id}">
@@ -422,6 +458,7 @@ function legHtml(ev, leg, i) {
       ${leg.images.length ? '' : '<span class="chip">No proof yet</span>'}
       ${ev.legs.length > 1 ? '<button class="quiet" data-act="del-leg">Remove route</button>' : ''}
     </div>
+    ${ready.length ? `<label class="f">Use a saved route<select id="l-use-${leg.id}" data-use><option value="">Choose a route</option>${ready.map(r => `<option value="${esc(r.id)}">${esc(routeText(r))}</option>`).join('')}</select></label>` : ''}
     <div class="stops">
       <div class="stop"><span class="mark"><span class="ring"></span></span>
         <label class="f">From<input id="l-from-${leg.id}" data-f="from" value="${esc(leg.from)}"></label></div>
@@ -441,6 +478,7 @@ function legHtml(ev, leg, i) {
       <button class="pill" data-act="add-row" data-type="other" data-label="Other cost">+ Other cost</button>
     </div>
     <div class="total"><span>Route total</span><b data-legtotal></b></div>
+    <button class="quiet save-route" data-act="save-route">Save to Routes</button>
     <div class="proof" data-drop>
       <h4>Travel proof</h4>
       ${thumbs ? `<div class="thumbs">${thumbs}</div>` : ''}
@@ -505,6 +543,8 @@ function render() {
       <span class="amt">${esc(rupiah(eventTotal(ev)))}</span>
       <small>${esc(fmtDate(ev.date))} · ${plural(ev.legs.length, 'route')}</small></button>`).join('')
     : '<p class="note">No claims this month.</p>';
+  $('routes-list').innerHTML = settings.routes.length ? settings.routes.map(savedRouteHtml).join('')
+    : `<div class="card empty"><span class="tile">${ic('route')}</span><b>No saved routes yet</b><span>Add one above, or tap Save to Routes on any claim.</span></div>`;
   const open = view === 'detail' && events.find(e => e.id === openId);
   $('list').innerHTML = open ? detailHtml(open) : '';
   recalc();
@@ -545,7 +585,7 @@ function recalc() {
 
 function show(next) {
   view = next;
-  for (const v of ['home', 'detail', 'summary', 'settings']) $(`view-${v}`).hidden = v !== view;
+  for (const v of ['home', 'detail', 'summary', 'routes', 'settings']) $(`view-${v}`).hidden = v !== view;
   $('nav').hidden = view === 'detail';
   document.querySelectorAll('.tab[data-go]').forEach(t => t.classList.toggle('on', t.dataset.go === view));
   render();
@@ -579,6 +619,32 @@ function dropImages(ev, ids) {
   if (!ev.example) ids.forEach(id => Store.deleteImage(id).catch(() => {}));
 }
 
+// Fills the stops, transport, distance and toll. Fares and parking change per trip, so they stay as typed.
+function applyRoute(leg, route) {
+  Object.assign(leg, { from: route.from, to: route.to, mode: route.mode, km: route.km });
+  leg.rows = leg.rows.filter(r => r.type !== 'toll');
+  leg.rows.unshift({ ...newRow('toll', 'Toll'), val: route.toll });
+}
+
+// Saving the same stops and transport again updates the saved route instead of adding a copy.
+function saveRoute(ev, leg) {
+  if (ev.example) { setStatus('Tap + first, then save routes from your own claim.', true); return; }
+  const from = leg.from.trim(), to = leg.to.trim(), mode = leg.mode.trim();
+  if (!from || !to) { setStatus('Fill in From and To before saving this route.', true); return; }
+  const key = r => [r.from, r.to, r.mode].map(s => s.trim().toLowerCase()).join('|');
+  const values = {
+    from, to, mode,
+    km: isCar(leg) ? leg.km : '',
+    toll: leg.rows.filter(r => r.type === 'toll' && r.val.trim()).map(r => r.val.trim()).join(' + '),
+  };
+  const found = settings.routes.find(r => key(r) === key(values));
+  if (found) Object.assign(found, values);
+  else settings.routes.push({ id: newId(), ...values });
+  saveSettings();
+  render();
+  setStatus(found ? 'Saved route updated' : 'Route saved to Routes');
+}
+
 document.addEventListener('click', e => {
   const go = e.target.closest('[data-go]');
   if (go) { show(go.dataset.go); return; }
@@ -591,6 +657,15 @@ $('next-month').addEventListener('click', () => shiftMonth(1));
 $('list').addEventListener('input', e => {
   const t = e.target, ev = findEv(t);
   if (!ev) return;
+  if (t.dataset.use !== undefined) {
+    const leg = findLeg(ev, t), route = settings.routes.find(r => r.id === t.value);
+    if (!route) return;
+    applyRoute(leg, route);
+    render();
+    queueSave(ev);
+    if (!isCar(leg)) $(`l-fare-${leg.id}`).focus();
+    return;
+  }
   if (t.dataset.pick) {
     const target = t.dataset.pick === 'kind' ? ev : findLeg(ev, t), custom = t.value === OTHER, id = t.id;
     target[t.dataset.pick] = custom ? '' : t.value;
@@ -624,6 +699,7 @@ $('list').addEventListener('click', async e => {
   const ev = findEv(btn), leg = findLeg(ev, btn), act = btn.dataset.act;
   let focusId = null;
   if (act === 'done') { show('home'); return; }
+  if (act === 'save-route') { saveRoute(ev, leg); return; }
   if (act === 'add-row') leg.rows.push(newRow(btn.dataset.type, btn.dataset.label));
   else if (act === 'del-row') leg.rows = leg.rows.filter(r => r !== findRow(leg, btn));
   else if (act === 'add-leg') {
@@ -752,7 +828,38 @@ $('rate').addEventListener('change', () => {
 });
 $('summary').addEventListener('change', () => { settings.summary = $('summary').checked; saveSettings(); });
 $('pdf').addEventListener('click', () => downloadPdf());
-$('pdf2').addEventListener('click', () => downloadPdf());
+
+$('add-route').addEventListener('click', () => {
+  const route = { id: newId(), from: 'Home', to: '', mode: 'Car', km: '', toll: '' };
+  settings.routes.push(route);
+  saveSettings();
+  render();
+  $(`s-to-${route.id}`).focus();
+});
+$('routes-list').addEventListener('input', e => {
+  const t = e.target, card = t.closest('[data-route]'), route = settings.routes.find(r => r.id === card?.dataset.route);
+  if (!route) return;
+  if (t.dataset.pick) {
+    const custom = t.value === OTHER, id = t.id;
+    route.mode = custom ? '' : t.value;
+    saveSettings();
+    render();
+    $(custom ? `${id}-text` : id).focus();
+    return;
+  }
+  if (!t.dataset.r) return;
+  route[t.dataset.r] = t.value;
+  if (t.dataset.r === 'toll') t.classList.toggle('bad', parseParts(t.value, 0) === null);
+  card.querySelector('[data-kmwrap]').hidden = !isCar(route);
+  saveSettings();
+});
+$('routes-list').addEventListener('click', e => {
+  const btn = e.target.closest('[data-route-del]');
+  if (!btn || !armed(btn)) return;
+  settings.routes = settings.routes.filter(r => r.id !== btn.closest('[data-route]').dataset.route);
+  saveSettings();
+  render();
+});
 
 /* ---------- PDF, laid out like the existing Claim Transport documents ---------- */
 
@@ -1075,8 +1182,10 @@ async function importBackup(file) {
     clearExample();
     const ids = new Set(data.events.map(e => e.id));
     events = events.filter(e => !ids.has(e.id)).concat(data.events);
-    const { name, rate, summary, lastBackup } = data.settings || {};
-    settings = { ...settings, name: settings.name || name || '', rate: Number(rate) > 0 ? Number(rate) : settings.rate, summary: summary ?? settings.summary, lastBackup: lastBackup || settings.lastBackup };
+    const { name, rate, summary, lastBackup, routes } = data.settings || {};
+    const restored = Array.isArray(routes) ? routes.filter(r => r && typeof r.id === 'string') : [];
+    const kept = settings.routes.filter(r => !restored.some(x => x.id === r.id));
+    settings = { ...settings, name: settings.name || name || '', rate: Number(rate) > 0 ? Number(rate) : settings.rate, summary: summary ?? settings.summary, lastBackup: lastBackup || settings.lastBackup, routes: kept.concat(restored) };
     await Store.saveSettings(settings);
     $('employee').value = settings.name;
     $('rate').value = settings.rate;
