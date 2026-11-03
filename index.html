@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -170,22 +170,22 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
   <section id="view-home">
     <header class="hero gut">
       <div class="hero-top">
-        <div><small id="greeting">Klaim perjalanan kerja</small><h1>Claim Transport</h1></div>
-        <button class="round" data-go="settings" aria-label="Pengaturan"><svg class="ic"><use href="#i-gear"/></svg></button>
+        <div><small id="greeting">Work travel claims</small><h1>Claim Transport</h1></div>
+        <button class="round" data-go="settings" aria-label="Settings"><svg class="ic"><use href="#i-gear"/></svg></button>
       </div>
-      <div class="grand"><span>Total klaim bulan ini</span><b id="grand">Rp 0</b><span id="grand-note">0 rute</span></div>
+      <div class="grand"><span>Total claims this month</span><b id="grand">Rp 0</b><span id="grand-note">0 routes</span></div>
     </header>
     <div class="lift gut">
       <div class="card month">
-        <button id="prev-month" aria-label="Bulan sebelumnya"><svg class="ic"><use href="#i-prev"/></svg></button>
+        <button id="prev-month" aria-label="Previous month"><svg class="ic"><use href="#i-prev"/></svg></button>
         <b data-month></b>
-        <button id="next-month" aria-label="Bulan berikutnya"><svg class="ic"><use href="#i-next"/></svg></button>
+        <button id="next-month" aria-label="Next month"><svg class="ic"><use href="#i-next"/></svg></button>
       </div>
-      <div class="notice" id="example-note" hidden>Ini contoh dan tidak disimpan. Tekan tombol <b>+</b> di bawah untuk mengisi klaim Anda sendiri, dan contoh ini akan hilang.</div>
-      <button class="notice name-note" id="name-note" data-go="settings" hidden>Isi nama Anda di <b>Pengaturan</b> supaya tercetak di PDF.</button>
+      <div class="notice" id="example-note" hidden>This is an example and is not saved. Tap <b>+</b> below to add your own claim, and the example will disappear.</div>
+      <button class="notice name-note" id="name-note" data-go="settings" hidden>Add your name in <b>Settings</b> so it prints on the PDF.</button>
       <div class="promo" id="missing-note" hidden><svg class="ic"><use href="#i-image"/></svg><span id="missing-text"></span></div>
-      <div class="section-title"><h2>Daftar klaim</h2><span id="claim-count"></span></div>
-      <div class="claims" id="claims"><div class="card empty">Memuat data…</div></div>
+      <div class="section-title"><h2>Claims</h2><span id="claim-count"></span></div>
+      <div class="claims" id="claims"><div class="card empty">Loading…</div></div>
     </div>
   </section>
 
@@ -195,51 +195,51 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 
   <section id="view-summary" hidden>
     <header class="hero small gut">
-      <div class="hero-top"><div><small data-month></small><h1>Ringkasan</h1></div></div>
+      <div class="hero-top"><div><small data-month></small><h1>Summary</h1></div></div>
     </header>
     <div class="lift gut">
       <div class="card">
         <div id="summary-list"></div>
-        <div class="total"><span>Total klaim</span><b id="summary-total">Rp 0</b></div>
+        <div class="total"><span>Total claims</span><b id="summary-total">Rp 0</b></div>
       </div>
       <div class="card">
-        <label class="check"><input type="checkbox" id="summary" checked>Sertakan halaman ringkasan di PDF</label>
-        <button class="cta" id="pdf2"><svg class="ic"><use href="#i-pdf"/></svg>Unduh PDF</button>
+        <label class="check"><input type="checkbox" id="summary" checked>Include a summary page in the PDF</label>
+        <button class="cta" id="pdf2"><svg class="ic"><use href="#i-pdf"/></svg>Download PDF</button>
       </div>
     </div>
   </section>
 
   <section id="view-settings" hidden>
     <header class="hero small gut">
-      <div class="hero-top"><div><small>Claim Transport</small><h1>Pengaturan</h1></div></div>
+      <div class="hero-top"><div><small>Claim Transport</small><h1>Settings</h1></div></div>
     </header>
     <div class="lift gut">
       <div class="card">
-        <label class="f">Tarif mobil per km (Rp)<input id="rate" inputmode="numeric"></label>
-        <p class="note">Tarif baru hanya berlaku untuk klaim baru. Klaim yang sudah ada tidak berubah.</p>
+        <label class="f">Car rate per km (Rp)<input id="rate" inputmode="numeric"></label>
+        <p class="note">A new rate applies to new claims only. Existing claims do not change.</p>
       </div>
       <div class="card">
-        <label class="f">Nama di PDF<input id="employee" autocomplete="name"></label>
+        <label class="f">Name on PDF<input id="employee" autocomplete="name"></label>
       </div>
       <div class="card">
-        <h2 style="font-size:15px;font-weight:800">Penyimpanan dan cadangan</h2>
-        <p class="note">Klaim dan bukti hanya tersimpan di browser perangkat ini, dan tidak ikut tersinkron ke perangkat lain. Data bisa hilang kalau data browser dihapus atau perangkat diganti, jadi buat cadangan secara berkala dan simpan PDF yang sudah diunduh.</p>
+        <h2 style="font-size:15px;font-weight:800">Storage and backup</h2>
+        <p class="note">Claims and proof are saved only in this browser on this device, and do not sync to other devices. They can be lost if browser data is cleared or the device is replaced, so back up regularly and keep the PDFs you download.</p>
         <p class="note" id="backup-note"></p>
         <div class="backup-actions">
-          <button class="outline" id="backup">Simpan cadangan</button>
-          <label class="outline">Pulihkan<input id="restore-file" type="file" accept=".json,application/json" aria-label="Pilih file cadangan"></label>
+          <button class="outline" id="backup">Back up</button>
+          <label class="outline">Restore<input id="restore-file" type="file" accept=".json,application/json" aria-label="Choose a backup file"></label>
         </div>
       </div>
     </div>
   </section>
 </div>
 
-<nav class="nav" id="nav" aria-label="Navigasi utama">
-  <button class="tab on" data-go="home"><i><svg class="ic"><use href="#i-home"/></svg></i>Beranda</button>
-  <button class="tab" data-go="summary"><i><svg class="ic"><use href="#i-list"/></svg></i>Ringkasan</button>
-  <button class="fab" id="add" aria-label="Tambah klaim"><svg class="ic"><use href="#i-plus"/></svg></button>
-  <button class="tab" id="pdf"><i><svg class="ic"><use href="#i-pdf"/></svg></i>Unduh PDF</button>
-  <button class="tab" data-go="settings"><i><svg class="ic"><use href="#i-gear"/></svg></i>Pengaturan</button>
+<nav class="nav" id="nav" aria-label="Main navigation">
+  <button class="tab on" data-go="home"><i><svg class="ic"><use href="#i-home"/></svg></i>Home</button>
+  <button class="tab" data-go="summary"><i><svg class="ic"><use href="#i-list"/></svg></i>Summary</button>
+  <button class="fab" id="add" aria-label="Add claim"><svg class="ic"><use href="#i-plus"/></svg></button>
+  <button class="tab" id="pdf"><i><svg class="ic"><use href="#i-pdf"/></svg></i>Download PDF</button>
+  <button class="tab" data-go="settings"><i><svg class="ic"><use href="#i-gear"/></svg></i>Settings</button>
 </nav>
 <div class="toast" id="status" role="status" hidden></div>
 
@@ -327,7 +327,7 @@ const Local = {
 
 const Store = Local;
 
-const saveError = () => 'Gagal menyimpan di perangkat ini. Ruang penyimpanan mungkin penuh; kosongkan ruang, lalu coba lagi.';
+const saveError = () => 'Could not save on this device. Storage may be full. Free up some space and try again.';
 
 let toastTimer;
 function setStatus(text, isErr) {
@@ -347,12 +347,12 @@ const saveTimers = {}, pendingSaves = {};
 function runSave(ev) {
   delete pendingSaves[ev.id];
   clearTimeout(saveTimers[ev.id]);
-  Store.saveEvent(ev).then(() => setSave('Tersimpan')).catch(e => setStatus(saveError(e), true));
+  Store.saveEvent(ev).then(() => setSave('Saved')).catch(e => setStatus(saveError(e), true));
 }
 function queueSave(ev) {
   if (ev.example) return;
   clearTimeout(saveTimers[ev.id]);
-  setSave('Menyimpan…');
+  setSave('Saving…');
   pendingSaves[ev.id] = ev;
   saveTimers[ev.id] = setTimeout(() => runSave(ev), 400);
 }
@@ -363,19 +363,19 @@ function flushSaves() { Object.values(pendingSaves).forEach(runSave); }
 const newRow = (type, label) => ({ id: newId(), type, label, val: '' });
 const newLeg = (from = 'Home', to = '', mode = 'Car') => ({
   id: newId(), from, to, mode, km: '', fare: '', images: [],
-  rows: [newRow('toll', 'Toll'), newRow('parking', 'Parkir')],
+  rows: [newRow('toll', 'Toll'), newRow('parking', 'Parking')],
 });
 const newEvent = date => ({ id: newId(), kind: 'Wedding', client: '', venue: '', date, rate: settings.rate, legs: [newLeg()] });
 
 function exampleEvent() {
   const ev = newEvent(`${viewMonth}-03`);
-  Object.assign(ev, { example: true, client: 'Contoh: Budi & Sari', venue: 'Hotel Contoh', rate: DEFAULT_RATE });
+  Object.assign(ev, { example: true, client: 'Example: Budi & Sari', venue: 'Example Hotel', rate: DEFAULT_RATE });
   const a = ev.legs[0];
-  Object.assign(a, { to: 'Gereja Contoh', km: '17' });
+  Object.assign(a, { to: 'Example Church', km: '17' });
   a.rows[0].val = '8500'; a.rows[1].val = '20000';
-  const b = newLeg('Gereja Contoh', 'Hotel Contoh', 'Car');
+  const b = newLeg('Example Church', 'Example Hotel', 'Car');
   b.km = '9'; b.rows[1].val = '40000';
-  const c = newLeg('Hotel Contoh', 'Home', 'Green SM');
+  const c = newLeg('Example Hotel', 'Home', 'Green SM');
   c.fare = '99500'; c.rows[0].val = '8500';
   ev.legs.push(b, c);
   return ev;
@@ -383,7 +383,8 @@ function exampleEvent() {
 
 /* ---------- Rendering ---------- */
 
-const MONTHS_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+const MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 const ic = name => `<svg class="ic"><use href="#i-${name}"/></svg>`;
 let view = 'home', openId = null, pdfBusy = false, booted = false, bootFailed = false;
 
@@ -391,60 +392,60 @@ const inMonth = () => events.filter(e => (e.date || '').startsWith(viewMonth)).s
 const findEv = el => events.find(e => e.id === el.closest('[data-ev]')?.dataset.ev);
 const findLeg = (ev, el) => ev?.legs.find(l => l.id === el.closest('[data-leg]')?.dataset.leg);
 const findRow = (leg, el) => leg?.rows.find(r => r.id === el.closest('[data-row]')?.dataset.row);
-const monthLabel = () => { const [y, m] = viewMonth.split('-'); return `${MONTHS_ID[+m - 1]} ${y}`; };
+const monthLabel = () => { const [y, m] = viewMonth.split('-'); return `${MONTHS_LONG[+m - 1]} ${y}`; };
 const missingProof = ev => ev.legs.filter(l => !l.images.length).length;
 
 // A dropdown whose last option reveals a free-text box; any value outside the list counts as free text.
 function pickerHtml(id, label, options, value, field, attr) {
   const custom = !options.includes(value);
   const opts = options.map(o => `<option${o === value ? ' selected' : ''}>${esc(o)}</option>`).join('');
-  return `<div class="stack"><label class="f">${label}<select id="${id}" data-pick="${field}">${opts}<option value="${OTHER}"${custom ? ' selected' : ''}>Lainnya (tulis sendiri)</option></select></label>
-    ${custom ? `<input id="${id}-text" ${attr}="${field}" value="${esc(value)}" aria-label="${label}, tulis sendiri">` : ''}</div>`;
+  return `<div class="stack"><label class="f">${label}<select id="${id}" data-pick="${field}">${opts}<option value="${OTHER}"${custom ? ' selected' : ''}>Other (type your own)</option></select></label>
+    ${custom ? `<input id="${id}-text" ${attr}="${field}" value="${esc(value)}" aria-label="${label}, type your own">` : ''}</div>`;
 }
 
 function rowHtml(row) {
   const label = row.type === 'other'
-    ? `<input id="r-l-${row.id}" data-f="label" value="${esc(row.label)}" aria-label="Nama biaya">`
+    ? `<input id="r-l-${row.id}" data-f="label" value="${esc(row.label)}" aria-label="Cost name">`
     : `<span>${esc(row.label)}</span>`;
   return `<div class="row" data-row="${row.id}">${label}
     <input id="r-v-${row.id}" data-f="val" value="${esc(row.val)}" aria-label="${esc(row.label)}">
     <span class="val" data-rowval></span>
-    <button data-act="del-row" aria-label="Hapus ${esc(row.label)}" title="Hapus">${ic('x')}</button></div>`;
+    <button data-act="del-row" aria-label="Remove ${esc(row.label)}" title="Remove">${ic('x')}</button></div>`;
 }
 
 function legHtml(ev, leg, i) {
-  const thumbs = leg.images.map((im, n) => `<div class="thumb"><img src="${esc(Store.url(im))}" alt="Bukti ${n + 1}">
-    <button data-act="del-img" data-img="${esc(im)}" aria-label="Hapus bukti ${n + 1}" title="Hapus">${ic('x')}</button>${n === 0 ? '<span>Utama</span>' : ''}</div>`).join('');
+  const thumbs = leg.images.map((im, n) => `<div class="thumb"><img src="${esc(Store.url(im))}" alt="Proof ${n + 1}">
+    <button data-act="del-img" data-img="${esc(im)}" aria-label="Remove proof ${n + 1}" title="Remove">${ic('x')}</button>${n === 0 ? '<span>Main</span>' : ''}</div>`).join('');
   return `<section class="card" data-leg="${leg.id}">
     <div class="leg-head">
-      <span class="tag">Rute ${i + 1}</span>
-      ${leg.images.length ? '' : '<span class="chip">Belum ada bukti</span>'}
-      ${ev.legs.length > 1 ? '<button class="quiet" data-act="del-leg">Hapus rute</button>' : ''}
+      <span class="tag">Route ${i + 1}</span>
+      ${leg.images.length ? '' : '<span class="chip">No proof yet</span>'}
+      ${ev.legs.length > 1 ? '<button class="quiet" data-act="del-leg">Remove route</button>' : ''}
     </div>
     <div class="stops">
       <div class="stop"><span class="mark"><span class="ring"></span></span>
-        <label class="f">Dari<input id="l-from-${leg.id}" data-f="from" value="${esc(leg.from)}"></label></div>
+        <label class="f">From<input id="l-from-${leg.id}" data-f="from" value="${esc(leg.from)}"></label></div>
       <div class="stop"><span class="mark"><svg class="pin"><use href="#i-pin"/></svg></span>
-        <label class="f">Ke<input id="l-to-${leg.id}" data-f="to" value="${esc(leg.to)}"></label></div>
+        <label class="f">To<input id="l-to-${leg.id}" data-f="to" value="${esc(leg.to)}"></label></div>
     </div>
     <div class="two">
       ${pickerHtml(`l-mode-${leg.id}`, 'Transport', MODES, leg.mode, 'mode', 'data-f')}
-      <label class="f" data-kmwrap>Jarak (km)<input id="l-km-${leg.id}" data-f="km" inputmode="decimal" value="${esc(leg.km)}"></label>
-      <label class="f" data-farewrap>Harga di invoice (Rp)<input id="l-fare-${leg.id}" data-f="fare" value="${esc(leg.fare)}"></label>
+      <label class="f" data-kmwrap>Distance (km)<input id="l-km-${leg.id}" data-f="km" inputmode="decimal" value="${esc(leg.km)}"></label>
+      <label class="f" data-farewrap>Invoice amount (Rp)<input id="l-fare-${leg.id}" data-f="fare" value="${esc(leg.fare)}"></label>
     </div>
     <div class="fare-line" data-carline><span data-faretext></span><b data-fare></b></div>
     ${leg.rows.map(rowHtml).join('')}
     <div class="adders">
       <button class="pill" data-act="add-row" data-type="toll" data-label="Toll">+ Toll</button>
-      <button class="pill" data-act="add-row" data-type="parking" data-label="Parkir">+ Parkir</button>
-      <button class="pill" data-act="add-row" data-type="other" data-label="Biaya lain">+ Biaya lain</button>
+      <button class="pill" data-act="add-row" data-type="parking" data-label="Parking">+ Parking</button>
+      <button class="pill" data-act="add-row" data-type="other" data-label="Other cost">+ Other cost</button>
     </div>
-    <div class="total"><span>Total rute</span><b data-legtotal></b></div>
+    <div class="total"><span>Route total</span><b data-legtotal></b></div>
     <div class="proof" data-drop>
-      <h4>Bukti perjalanan</h4>
+      <h4>Travel proof</h4>
       ${thumbs ? `<div class="thumbs">${thumbs}</div>` : ''}
-      <p>Screenshot Google Maps atau invoice taxi online. Gambar pertama jadi bukti utama, sisanya (mis. struk parkir) tampil di bawah total pada PDF.<span class="desk-only"> Bisa juga seret file ke sini atau tempel dengan ⌘V.</span></p>
-      <label class="pill add-proof">${ic('image')}Pilih gambar<input id="l-file-${leg.id}" type="file" accept="image/*" multiple data-file aria-label="Pilih gambar bukti"></label>
+      <p>A Google Maps screenshot or online taxi invoice. The first image is the main proof. Others, such as parking receipts, appear below the total on the PDF.<span class="desk-only"> You can also drag files here or paste with ⌘V.</span></p>
+      <label class="pill add-proof">${ic('image')}Choose images<input id="l-file-${leg.id}" type="file" accept="image/*" multiple data-file aria-label="Choose proof images"></label>
     </div>
   </section>`;
 }
@@ -453,27 +454,27 @@ function detailHtml(ev) {
   return `<div data-ev="${ev.id}">
     <header class="hero small gut">
       <div class="hero-top">
-        <button class="round" data-act="done" aria-label="Kembali ke daftar klaim">${ic('back')}</button>
-        <div><small data-savestate class="save-state">Detail klaim</small><h1 data-title></h1></div>
-        <button class="round" data-act="del-ev" aria-label="Hapus klaim" title="Hapus klaim">${ic('trash')}</button>
+        <button class="round" data-act="done" aria-label="Back to claims">${ic('back')}</button>
+        <div><small data-savestate class="save-state">Claim details</small><h1 data-title></h1></div>
+        <button class="round" data-act="del-ev" aria-label="Delete claim" title="Delete claim">${ic('trash')}</button>
       </div>
     </header>
     <div class="lift gut">
       <section class="card">
-        ${pickerHtml(`e-kind-${ev.id}`, 'Keterangan', KINDS, ev.kind, 'kind', 'data-e')}
-        <label class="f">Nama client<input id="e-client-${ev.id}" data-e="client" value="${esc(ev.client)}"></label>
-        <label class="f">Lokasi (opsional)<input id="e-venue-${ev.id}" data-e="venue" value="${esc(ev.venue)}"></label>
-        <label class="f">Tanggal<input id="e-date-${ev.id}" type="date" data-e="date" value="${esc(ev.date)}"></label>
+        ${pickerHtml(`e-kind-${ev.id}`, 'Description', KINDS, ev.kind, 'kind', 'data-e')}
+        <label class="f">Client name<input id="e-client-${ev.id}" data-e="client" value="${esc(ev.client)}"></label>
+        <label class="f">Venue (optional)<input id="e-venue-${ev.id}" data-e="venue" value="${esc(ev.venue)}"></label>
+        <label class="f">Date<input id="e-date-${ev.id}" type="date" data-e="date" value="${esc(ev.date)}"></label>
       </section>
       ${ev.legs.map((l, i) => legHtml(ev, l, i)).join('')}
       <div class="add-routes">
-        <button class="pill" data-act="add-leg">+ Tambah rute</button>
-        <button class="pill" data-act="home-leg">+ Rute pulang</button>
+        <button class="pill" data-act="add-leg">+ Add route</button>
+        <button class="pill" data-act="home-leg">+ Return route</button>
       </div>
     </div>
     <div class="donebar">
-      <div><small>Total klaim ini</small><b data-evtotal></b></div>
-      <button class="cta" data-act="done">Selesai</button>
+      <div><small>Total for this claim</small><b data-evtotal></b></div>
+      <button class="cta" data-act="done">Done</button>
     </div>
   </div>`;
 }
@@ -483,10 +484,10 @@ function claimHtml(ev) {
   return `<button class="claim" data-open="${ev.id}">
     <span class="date-tile"><b>${m ? +m[3] : '-'}</b><span>${m ? MONTHS[+m[2] - 1] : ''}</span></span>
     <span class="claim-main">
-      <span class="kind">${esc(ev.kind || 'Klaim')}</span>
-      <b>${esc(ev.client || 'Tanpa nama client')}</b>
-      <small>${ev.legs.length} rute${ev.venue ? ' · ' + esc(ev.venue) : ''}</small>
-      ${missing ? `<span class="chip">${missing} belum ada bukti</span>` : ''}
+      <span class="kind">${esc(ev.kind || 'Claim')}</span>
+      <b>${esc(ev.client || 'No client name')}</b>
+      <small>${plural(ev.legs.length, 'route')}${ev.venue ? ' · ' + esc(ev.venue) : ''}</small>
+      ${missing ? `<span class="chip">${missing} without proof</span>` : ''}
     </span>
     <span class="claim-amt">${esc(rupiah(eventTotal(ev)))}</span>
   </button>`;
@@ -496,14 +497,14 @@ function render() {
   const list = inMonth();
   document.querySelectorAll('[data-month]').forEach(el => { el.textContent = monthLabel(); });
   $('example-note').hidden = !showingExample;
-  $('claim-count').textContent = list.length ? `${list.length} client` : '';
+  $('claim-count').textContent = list.length ? plural(list.length, 'client') : '';
   $('claims').innerHTML = list.length ? list.map(claimHtml).join('')
-    : `<div class="card empty"><span class="tile">${ic('car')}</span><b>Belum ada klaim di bulan ini</b><span>Tekan tombol + di bawah untuk mulai.</span></div>`;
+    : `<div class="card empty"><span class="tile">${ic('car')}</span><b>No claims this month</b><span>Tap + below to get started.</span></div>`;
   $('summary-list').innerHTML = list.length ? list.map(ev => `<button class="sum-row" data-open="${ev.id}">
-      <b>${esc([ev.kind, ev.client].filter(Boolean).join(' - ') || 'Klaim')}</b>
+      <b>${esc([ev.kind, ev.client].filter(Boolean).join(' - ') || 'Claim')}</b>
       <span class="amt">${esc(rupiah(eventTotal(ev)))}</span>
-      <small>${esc(fmtDate(ev.date))} · ${ev.legs.length} rute</small></button>`).join('')
-    : '<p class="note">Belum ada klaim di bulan ini.</p>';
+      <small>${esc(fmtDate(ev.date))} · ${plural(ev.legs.length, 'route')}</small></button>`).join('')
+    : '<p class="note">No claims this month.</p>';
   const open = view === 'detail' && events.find(e => e.id === openId);
   $('list').innerHTML = open ? detailHtml(open) : '';
   recalc();
@@ -514,7 +515,7 @@ function recalc() {
   for (const card of $('list').querySelectorAll('[data-ev]')) {
     const ev = events.find(e => e.id === card.dataset.ev);
     if (!ev) continue;
-    card.querySelector('[data-title]').textContent = ev.client || 'Klaim baru';
+    card.querySelector('[data-title]').textContent = ev.client || 'New claim';
     for (const legEl of card.querySelectorAll('[data-leg]')) {
       const leg = ev.legs.find(l => l.id === legEl.dataset.leg);
       const car = isCar(leg);
@@ -537,9 +538,9 @@ function recalc() {
   const total = rupiah(list.reduce((a, e) => a + eventTotal(e), 0));
   $('grand').textContent = total;
   $('summary-total').textContent = total;
-  $('grand-note').textContent = `${list.length} client, ${legs.length} rute`;
+  $('grand-note').textContent = `${plural(list.length, 'client')}, ${plural(legs.length, 'route')}`;
   $('missing-note').hidden = !missing || showingExample;
-  $('missing-text').textContent = `${missing} rute belum ada bukti. Lengkapi sebelum mengunduh PDF.`;
+  $('missing-text').textContent = `${plural(missing, 'route')} without proof. Add it before downloading the PDF.`;
 }
 
 function show(next) {
@@ -569,7 +570,7 @@ function armed(btn) {
   const old = btn.innerHTML;
   btn.dataset.armed = '1';
   btn.classList.add('armed');
-  btn.textContent = 'Yakin?';
+  btn.textContent = 'Sure?';
   setTimeout(() => { if (btn.isConnected) { delete btn.dataset.armed; btn.classList.remove('armed'); btn.innerHTML = old; } }, 3500);
   return false;
 }
@@ -633,7 +634,7 @@ $('list').addEventListener('click', async e => {
   } else if (act === 'home-leg') {
     const first = ev.legs[0], last = ev.legs[ev.legs.length - 1], back = newLeg(last.to, first.from, last.mode);
     back.rows = first.rows.filter(r => r.type === 'toll').map(r => ({ ...r, id: newId() }));
-    back.rows.push(newRow('parking', 'Parkir'));
+    back.rows.push(newRow('parking', 'Parking'));
     ev.legs.push(back);
     focusId = isCar(back) ? `l-km-${back.id}` : `l-fare-${back.id}`;
   } else if (act === 'del-img') {
@@ -652,7 +653,7 @@ $('list').addEventListener('click', async e => {
     else {
       clearTimeout(saveTimers[ev.id]);
       delete pendingSaves[ev.id];
-      Store.deleteEvent(ev.id).then(() => setStatus('Klaim dihapus')).catch(() => setStatus('Gagal menghapus. Periksa koneksi Anda, lalu coba lagi.', true));
+      Store.deleteEvent(ev.id).then(() => setStatus('Claim deleted')).catch(() => setStatus('Could not delete the claim. Try again.', true));
     }
     show('home');
     return;
@@ -693,9 +694,9 @@ function loadImage(src) {
 
 async function addImages(ev, leg, files) {
   const list = [...files].filter(f => f.type.startsWith('image/') || /\.(heic|heif)$/i.test(f.name));
-  if (!list.length) { setStatus('File itu bukan gambar. Gunakan PNG atau JPG.', true); return; }
-  if (ev.example) { clearExample(); setStatus('Tekan tombol + dulu, lalu lampirkan bukti pada klaim Anda.', true); show('home'); return; }
-  setStatus(`Mengunggah ${list.length} gambar…`);
+  if (!list.length) { setStatus('That file is not an image. Use PNG or JPG.', true); return; }
+  if (ev.example) { clearExample(); setStatus('Tap + first, then attach proof to your own claim.', true); show('home'); return; }
+  setStatus(`Adding ${plural(list.length, 'image')}…`);
   let unreadable = 0, saveFailed = null;
   for (const f of list) {
     let blob;
@@ -705,8 +706,8 @@ async function addImages(ev, leg, files) {
   render();
   await Store.saveEvent(ev).catch(e => { saveFailed = e; });
   if (saveFailed) setStatus(saveError(saveFailed), true);
-  else if (unreadable) setStatus(`${unreadable} gambar gagal dibaca. Foto HEIC dari iPhone perlu diubah ke JPG atau PNG dulu.`, true);
-  else setStatus('Bukti tersimpan');
+  else if (unreadable) setStatus(`${plural(unreadable, 'image')} could not be read. Convert iPhone HEIC photos to JPG or PNG first.`, true);
+  else setStatus('Proof saved');
 }
 
 let activeProof = null;
@@ -729,7 +730,7 @@ document.addEventListener('paste', e => {
 });
 
 $('add').addEventListener('click', () => {
-  if (!booted) { setStatus(bootFailed ? 'Penyimpanan tidak tersedia. Lihat pesan di layar.' : 'Data masih dimuat. Coba lagi sebentar.', bootFailed); return; }
+  if (!booted) { setStatus(bootFailed ? 'Storage is unavailable. See the message on screen.' : 'Still loading. Try again in a moment.', bootFailed); return; }
   clearExample();
   const now = new Date(), today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const ev = newEvent(today.startsWith(viewMonth) ? today : `${viewMonth}-01`);
@@ -739,13 +740,13 @@ $('add').addEventListener('click', () => {
   $(`e-client-${ev.id}`).focus();
 });
 
-function saveSettings() { Store.saveSettings(settings).catch(() => setStatus('Gagal menyimpan pengaturan.', true)); }
+function saveSettings() { Store.saveSettings(settings).catch(() => setStatus('Could not save your settings.', true)); }
 $('rate').addEventListener('change', () => {
   const r = sum(parseParts($('rate').value, 0));
   if (r > 0) {
     settings.rate = r;
     saveSettings();
-    setStatus(`Tarif ${rupiah(r)} per km berlaku untuk klaim baru.`);
+    setStatus(`The rate of ${rupiah(r)} per km applies to new claims.`);
   }
   $('rate').value = settings.rate;
 });
@@ -776,11 +777,11 @@ function drawFit(doc, im, x, y, boxW, boxH, center) {
 }
 
 function pdfRows(ev, leg) {
-  const rows = [{ label: isCar(leg) ? `Harga (${leg.km || 0} km x ${rupiah(ev.rate)})` : 'Harga', amount: legFare(ev, leg) }];
+  const rows = [{ label: isCar(leg) ? `Fare (${leg.km || 0} km x ${rupiah(ev.rate)})` : 'Fare', amount: legFare(ev, leg) }];
   for (const r of leg.rows) {
     const parts = parseParts(r.val, ev.rate);
     if (!parts || !sum(parts)) continue;
-    const name = r.label || 'Biaya lain';
+    const name = r.label || 'Other cost';
     rows.push({
       label: parts.length > 1 ? `${name} (${parts.map(p => p.toLocaleString('en-US')).join(' + ')})` : name,
       amount: sum(parts) * (r.type === 'promo' ? -1 : 1),
@@ -817,11 +818,11 @@ async function drawLeg(doc, ev, leg, top, index) {
   let y = top + 26;
   pen(doc, 'bold', 8.5, ACCENT);
   doc.setCharSpace(0.6);
-  doc.text((ev.kind || 'Klaim').toUpperCase(), x, y);
+  doc.text((ev.kind || 'Claim').toUpperCase(), x, y);
   doc.setCharSpace(0);
   if (ev.legs.length > 1) {
     pen(doc, 'normal', 8.5, MUTED);
-    doc.text(`Rute ${index + 1} dari ${ev.legs.length}`, right, y, { align: 'right' });
+    doc.text(`Route ${index + 1} of ${ev.legs.length}`, right, y, { align: 'right' });
   }
   y += 19;
   pen(doc, 'bold', 15);
@@ -866,7 +867,7 @@ async function drawLeg(doc, ev, leg, top, index) {
   const roomBelow = bottom - y - 22;
   if (rest.length && roomBelow >= 56) {
     pen(doc, 'bold', 7.5, MUTED);
-    doc.text('BUKTI TAMBAHAN', x, y + 15);
+    doc.text('ADDITIONAL PROOF', x, y + 15);
     const top2 = y + 22, cols = Math.min(rest.length, 3), rowsN = Math.ceil(rest.length / cols), gap = 8;
     const cellW = (width - gap * (cols - 1)) / cols, cellH = (roomBelow - gap * (rowsN - 1)) / rowsN;
     rest.forEach((im, i) => drawFit(doc, im, x + (i % cols) * (cellW + gap), top2 + Math.floor(i / cols) * (cellH + gap), cellW, cellH));
@@ -876,7 +877,7 @@ async function drawLeg(doc, ev, leg, top, index) {
     images.forEach((im, i) => drawFit(doc, im, box.x, box.y + i * (cellH + gap), box.w, cellH, true));
   } else {
     pen(doc, 'normal', 9.5, MUTED);
-    doc.text('Belum ada bukti', box.x + box.w / 2, box.y + box.h / 2, { align: 'center' });
+    doc.text('No proof attached', box.x + box.w / 2, box.y + box.h / 2, { align: 'center' });
   }
 }
 
@@ -884,13 +885,13 @@ function pageHeader(doc, period) {
   pen(doc, 'bold', 19);
   doc.text('Claim Transport', MARGIN, 52);
   pen(doc, 'normal', 8.5, MUTED);
-  doc.text('PERIODE', A4.w - MARGIN, 39, { align: 'right' });
+  doc.text('PERIOD', A4.w - MARGIN, 39, { align: 'right' });
   pen(doc, 'bold', 12);
   doc.text(period, A4.w - MARGIN, 53, { align: 'right' });
   if (settings.name) {
     const nameRight = A4.w - MARGIN - 80;
     pen(doc, 'normal', 8.5, MUTED);
-    doc.text('DIAJUKAN OLEH', nameRight, 39, { align: 'right' });
+    doc.text('SUBMITTED BY', nameRight, 39, { align: 'right' });
     pen(doc, 'bold', 12);
     doc.text(doc.splitTextToSize(settings.name, 210)[0], nameRight, 53, { align: 'right' });
   }
@@ -906,14 +907,14 @@ function drawSummary(doc, list, period) {
     doc.setFillColor(...INK);
     doc.rect(left, y, right - left, 24, 'F');
     pen(doc, 'bold', 9, [255, 255, 255]);
-    doc.text('Tanggal', cDate, y + 15.5);
-    doc.text('Keterangan', cName, y + 15.5);
-    doc.text('Rute', cLegs, y + 15.5, { align: 'right' });
-    doc.text('Jumlah', cAmt, y + 15.5, { align: 'right' });
+    doc.text('Date', cDate, y + 15.5);
+    doc.text('Description', cName, y + 15.5);
+    doc.text('Routes', cLegs, y + 15.5, { align: 'right' });
+    doc.text('Amount', cAmt, y + 15.5, { align: 'right' });
     return y + 24;
   };
   pen(doc, 'bold', 13);
-  doc.text('Ringkasan', left, 94);
+  doc.text('Summary', left, 94);
   let y = tableHead(106);
   list.forEach(ev => {
     pen(doc, 'normal', 10);
@@ -937,7 +938,7 @@ function drawSummary(doc, list, period) {
   doc.setFillColor(...TINT);
   doc.roundedRect(left, y, right - left, 32, 3, 3, 'F');
   pen(doc, 'bold', 11);
-  doc.text('Total klaim', cDate, y + 20.5);
+  doc.text('Total claims', cDate, y + 20.5);
   pen(doc, 'bold', 14, ACCENT);
   doc.text(money(list.reduce((a, e) => a + eventTotal(e), 0)), cAmt, y + 21, { align: 'right' });
 }
@@ -966,7 +967,7 @@ async function buildPdf(list, withSummary) {
     doc.setPage(p);
     pen(doc, 'normal', 8, MUTED);
     doc.text(`Claim Transport - ${period}`, MARGIN, 822);
-    doc.text(`Halaman ${p} dari ${pages}`, A4.w - MARGIN, 822, { align: 'right' });
+    doc.text(`Page ${p} of ${pages}`, A4.w - MARGIN, 822, { align: 'right' });
   }
   return doc;
 }
@@ -974,18 +975,18 @@ async function buildPdf(list, withSummary) {
 async function downloadPdf() {
   if (pdfBusy) return;
   const list = inMonth();
-  if (!list.length) { setStatus('Belum ada klaim di bulan ini, jadi belum ada PDF yang bisa dibuat.', true); return; }
-  if (!window.jspdf) { setStatus('Pembuat PDF belum termuat. Periksa koneksi internet, lalu muat ulang halaman.', true); return; }
+  if (!list.length) { setStatus('There are no claims this month, so there is no PDF to create.', true); return; }
+  if (!window.jspdf) { setStatus('The PDF maker has not loaded. Check your internet connection and reload the page.', true); return; }
   pdfBusy = true;
-  setStatus('Membuat PDF…');
+  setStatus('Creating PDF…');
   try {
     const doc = await buildPdf(list, $('summary').checked);
     const [y, m] = viewMonth.split('-');
     const filename = `Claim Transport - ${MONTHS[+m - 1]} ${y.slice(2)}.pdf`;
     saveFile(filename, doc.output('blob'));
-    setStatus(`${filename} diunduh`);
+    setStatus(`${filename} downloaded`);
   } catch (e) {
-    setStatus('PDF gagal dibuat. Salah satu bukti mungkin tidak terbaca; coba unggah ulang gambarnya.', true);
+    setStatus('Could not create the PDF. One of the proof images may be unreadable. Try adding it again.', true);
   } finally { pdfBusy = false; }
 }
 
@@ -1001,11 +1002,11 @@ function saveFile(filename, blob) {
 
 function refreshAccount() {
   const first = (settings.name || '').split(' ')[0];
-  $('greeting').textContent = first ? `Halo, ${first}` : 'Klaim perjalanan kerja';
+  $('greeting').textContent = first ? `Hi, ${first}` : 'Work travel claims';
   $('name-note').hidden = !!settings.name;
   $('backup-note').textContent = settings.lastBackup
-    ? `Cadangan terakhir: ${fmtDate(settings.lastBackup)}.`
-    : 'Belum pernah membuat cadangan.';
+    ? `Last backup: ${fmtDate(settings.lastBackup)}.`
+    : 'No backup yet.';
 }
 
 $('employee').addEventListener('change', () => {
@@ -1013,7 +1014,7 @@ $('employee').addEventListener('change', () => {
   $('employee').value = settings.name;
   saveSettings();
   refreshAccount();
-  setStatus('Nama di PDF disimpan');
+  setStatus('Name saved');
 });
 
 const blobToDataUrl = blob => new Promise((res, rej) => {
@@ -1031,8 +1032,8 @@ const localDate = () => {
 // One file holds every claim and proof, so an employee can recover from cleared browser data or move to a new phone.
 async function exportBackup() {
   const saved = events.filter(e => !e.example);
-  if (!saved.length) { setStatus('Belum ada klaim untuk dicadangkan.', true); return; }
-  setStatus('Menyiapkan cadangan…');
+  if (!saved.length) { setStatus('There are no claims to back up yet.', true); return; }
+  setStatus('Preparing backup…');
   try {
     flushSaves();
     const images = {};
@@ -1042,12 +1043,12 @@ async function exportBackup() {
     }
     settings.lastBackup = localDate();
     const body = JSON.stringify({ app: 'claim-transport', version: 1, settings, events: saved, images });
-    saveFile(`Cadangan Claim Transport ${settings.lastBackup}.json`, new Blob([body], { type: 'application/json' }));
+    saveFile(`Claim Transport Backup ${settings.lastBackup}.json`, new Blob([body], { type: 'application/json' }));
     saveSettings();
     refreshAccount();
-    setStatus('Cadangan diunduh. Simpan file itu di tempat aman.');
+    setStatus('Backup downloaded. Keep the file somewhere safe.');
   } catch (e) {
-    setStatus('Cadangan gagal dibuat. Coba lagi.', true);
+    setStatus('Could not create the backup. Try again.', true);
   }
 }
 
@@ -1059,10 +1060,10 @@ async function importBackup(file) {
   let data;
   try { data = JSON.parse(await file.text()); } catch (e) { data = null; }
   if (data?.app !== 'claim-transport' || !Array.isArray(data.events) || !data.events.every(validClaim)) {
-    setStatus('File itu bukan cadangan Claim Transport.', true);
+    setStatus('That file is not a Claim Transport backup.', true);
     return;
   }
-  setStatus('Memulihkan cadangan…');
+  setStatus('Restoring backup…');
   try {
     for (const [id, url] of Object.entries(data.images || {})) {
       if (typeof url !== 'string' || !url.startsWith('data:image/')) continue;
@@ -1083,9 +1084,9 @@ async function importBackup(file) {
     refreshAccount();
     viewMonth = events.map(e => e.date || '').sort().pop().slice(0, 7) || viewMonth;
     render();
-    setStatus(`${data.events.length} klaim dipulihkan`);
+    setStatus(`${plural(data.events.length, 'claim')} restored`);
   } catch (e) {
-    setStatus('Cadangan gagal dipulihkan. Ruang penyimpanan mungkin penuh.', true);
+    setStatus('Could not restore the backup. Storage may be full.', true);
   }
 }
 
@@ -1108,8 +1109,8 @@ async function boot() {
     await Store.prepare(events.flatMap(e => e.legs.flatMap(l => l.images)));
   } catch (e) {
     bootFailed = true;
-    $('claims').innerHTML = '<div class="card empty"><b>Browser ini tidak mengizinkan penyimpanan</b><span>Klaim tidak bisa disimpan. Tutup mode privat atau samaran, lalu buka website ini lagi di browser biasa.</span></div>';
-    setStatus('Penyimpanan tidak tersedia di browser ini.', true);
+    $('claims').innerHTML = '<div class="card empty"><b>This browser does not allow saving</b><span>Claims cannot be saved here. Close private or incognito mode, then open this website in a normal browser window.</span></div>';
+    setStatus('Storage is unavailable in this browser.', true);
     return;
   }
   // Asks the browser not to clear this site's data on its own. It may say no, so nothing depends on the answer.
