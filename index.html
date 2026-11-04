@@ -119,6 +119,7 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .thumb span { position: absolute; left: 0; right: 0; bottom: 0; font-size: 11px; font-weight: 700; text-align: center; padding: 2px; color: var(--on-brand); background: var(--brand); }
 .add-proof { position: relative; cursor: pointer; width: fit-content; }
 .add-proof input { position: absolute; inset: 0; opacity: 0; width: 100%; min-height: 0; height: 100%; padding: 0; cursor: pointer; }
+.read-map { display: grid; gap: 6px; margin-bottom: 12px; }
 .add-routes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .add-routes .pill { background: var(--surface); box-shadow: var(--shadow); min-height: 48px; border-radius: 16px; }
 .save-state { font-size: 12px; opacity: .9; }
@@ -475,6 +476,10 @@ function legHtml(ev, leg, i) {
       <label class="f" data-kmwrap>Distance (km)<input id="l-km-${leg.id}" data-f="km" inputmode="decimal" value="${esc(leg.km)}"></label>
       <label class="f" data-farewrap>Invoice amount (Rp)<input id="l-fare-${leg.id}" data-f="fare" value="${esc(leg.fare)}"></label>
     </div>
+    <div class="read-map" data-readwrap>
+      <label class="pill add-proof">${ic('image')}Read from screenshot<input id="l-read-${leg.id}" type="file" accept="image/*" data-read aria-label="Choose a Google Maps screenshot to read"></label>
+      <p class="note">Fills in the distance and toll from a Google Maps screenshot, and adds it as proof. Pick your route in Maps first.</p>
+    </div>
     <div class="fare-line" data-carline><span data-faretext></span><b data-fare></b></div>
     ${leg.rows.map(rowHtml).join('')}
     <div class="adders">
@@ -567,6 +572,7 @@ function recalc() {
       legEl.querySelector('[data-kmwrap]').hidden = !car;
       legEl.querySelector('[data-farewrap]').hidden = car;
       legEl.querySelector('[data-carline]').hidden = !car;
+      legEl.querySelector('[data-readwrap]').hidden = !car;
       legEl.querySelector('[data-faretext]').textContent = `${leg.km || 0} km × ${rupiah(ev.rate)}`;
       legEl.querySelector('[data-fare]').textContent = rupiah(legFare(ev, leg));
       legEl.querySelector('[data-f="fare"]').classList.toggle('bad', parseParts(leg.fare, ev.rate) === null);
@@ -696,6 +702,7 @@ $('list').addEventListener('change', e => {
     render();
   }
   if (t.dataset.file !== undefined && ev) { addImages(ev, findLeg(ev, t), t.files); t.value = ''; }
+  if (t.dataset.read !== undefined && ev) { readScreenshot(ev, findLeg(ev, t), t.files[0]); t.value = ''; }
 });
 
 $('list').addEventListener('click', async e => {
@@ -789,6 +796,93 @@ async function addImages(ev, leg, files) {
   if (saveFailed) setStatus(saveError(saveFailed), true);
   else if (unreadable) setStatus(`${plural(unreadable, 'image')} could not be read. Convert iPhone HEIC photos to JPG or PNG first.`, true);
   else setStatus('Proof saved');
+  return !saveFailed && !unreadable;
+}
+
+/* ---------- Reading Google Maps screenshots: the text is read on this device ---------- */
+
+// Finds the distance and toll in a directions screenshot, as "25 km · IDR 19,500". Maps only prices the toll on some routes.
+function parseMapsText(text) {
+  const lines = String(text).split('\n');
+  const found = lines.map(l => l.match(/(\d+(?:[.,]\d+)?)\s*km\b/i));
+  const at = found.findIndex(Boolean);
+  if (at < 0) return null;
+  const km = found[at][1].replace(',', '.');
+  const money = `${lines[at]} ${lines[at + 1] || ''}`.match(/(?:[I1l|]DR|Rp\.?)\s*(\d{1,3}(?:[.,]\d{3})+|\d{4,})/i);
+  const others = found.filter(m => m && m[1].replace(',', '.') !== km);
+  return { km, toll: money ? money[1].replace(/[.,]/g, '') : '', several: others.length > 0 };
+}
+
+// Keeps the lower part of the screen, where Maps prints the route, as dark text on a light background.
+async function mapsPanel(file, width) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await loadImage(url);
+    const top = Math.round(img.naturalHeight * 0.6), h = img.naturalHeight - top;
+    const scale = width / img.naturalWidth;
+    const c = document.createElement('canvas');
+    c.width = width;
+    c.height = Math.round(h * scale);
+    const g = c.getContext('2d');
+    g.drawImage(img, 0, top, img.naturalWidth, h, 0, 0, c.width, c.height);
+    const shot = g.getImageData(0, 0, c.width, c.height), px = shot.data;
+    let total = 0;
+    for (let i = 0; i < px.length; i += 4) total += (px[i] + px[i + 1] + px[i + 2]) / 3;
+    const dark = total / (px.length / 4) < 128;
+    for (let i = 0; i < px.length; i += 4) {
+      const v = (px[i] + px[i + 1] + px[i + 2]) / 3;
+      px[i] = px[i + 1] = px[i + 2] = dark ? 255 - v : v;
+    }
+    g.putImageData(shot, 0, 0);
+    return c;
+  } finally { URL.revokeObjectURL(url); }
+}
+
+function loadScript(src) {
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = res;
+    s.onerror = () => rej(new Error('script'));
+    document.head.append(s);
+  });
+}
+
+// Reads the screen at two sizes. A misread digit rarely repeats, so a disagreement means the figures need checking.
+async function readMapsScreen(file) {
+  const large = await mapsPanel(file, 2000), small = await mapsPanel(file, 1200);
+  if (!window.Tesseract) await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
+  const worker = await Tesseract.createWorker('eng');
+  try {
+    const first = parseMapsText((await worker.recognize(large)).data.text);
+    const second = parseMapsText((await worker.recognize(small)).data.text);
+    const got = first || second;
+    if (!got) return null;
+    return { ...got, unsure: got.several || !first || !second || first.km !== second.km || first.toll !== second.toll };
+  } finally { worker.terminate(); }
+}
+
+let reading = false;
+async function readScreenshot(ev, leg, file) {
+  if (!file) return;
+  if (ev.example) { clearExample(); setStatus('Tap + first, then read screenshots on your own claim.', true); show('home'); return; }
+  if (reading) { setStatus('Still reading the last screenshot. Try again in a moment.', true); return; }
+  reading = true;
+  setStatus('Reading the screenshot…');
+  try {
+    let got;
+    try { got = await readMapsScreen(file); }
+    catch (e) { setStatus('Could not read that screenshot. Check your internet connection, or type the distance and toll.', true); return; }
+    if (!got) { setStatus('No distance found. Use a Google Maps directions screenshot, or type the distance and toll.', true); return; }
+    leg.km = got.km;
+    if (got.toll) {
+      leg.rows = leg.rows.filter(r => r.type !== 'toll');
+      leg.rows.unshift({ ...newRow('toll', 'Toll'), val: got.toll });
+    }
+    if (!await addImages(ev, leg, [file])) return;
+    const filled = got.toll ? `Filled in ${got.km} km and ${rupiah(+got.toll)} toll` : `Filled in ${got.km} km. No toll amount shown, so Toll stays as it was`;
+    setStatus(got.unsure ? `${filled}. The screenshot was hard to read, so compare these figures with it.` : `${filled}. Please check.`, got.unsure);
+  } finally { reading = false; }
 }
 
 let activeProof = null;
