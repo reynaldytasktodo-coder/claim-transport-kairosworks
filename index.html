@@ -478,7 +478,7 @@ function legHtml(ev, leg, i) {
     </div>
     <div class="read-map" data-readwrap>
       <label class="pill add-proof">${ic('image')}Read from screenshot<input id="l-read-${leg.id}" type="file" accept="image/*" data-read aria-label="Choose a Google Maps screenshot to read"></label>
-      <p class="note">Fills in the distance and toll from a Google Maps screenshot, and adds it as proof. Pick your route in Maps first.</p>
+      <p class="note">Fills in the destination, distance and toll from a Google Maps screenshot, and adds it as proof. A destination you already typed stays. Pick your route in Maps first.</p>
     </div>
     <div class="fare-line" data-carline><span data-faretext></span><b data-fare></b></div>
     ${leg.rows.map(rowHtml).join('')}
@@ -813,18 +813,28 @@ function parseMapsText(text) {
   return { km, toll: money ? money[1].replace(/[.,]/g, '') : '', several: others.length > 0 };
 }
 
-// Keeps the lower part of the screen, where Maps prints the route, as dark text on a light background.
-async function mapsPanel(file, width) {
+// The destination is the last line of the search box at the top of the screen.
+function parseMapsPlace(text) {
+  const lines = String(text).split('\n').map(l => l.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N})]+$/gu, '')).filter(l => (l.match(/\p{L}/gu) || []).length >= 3);
+  const place = lines[lines.length - 1] || '';
+  return /your location/i.test(place) ? '' : place;
+}
+
+// Maps prints the route at the bottom of the screen and the stops in a box at the top, leaving out the box's icons.
+const MAPS_ROUTE = { x: 0, y: 0.6, w: 1, h: 0.4 }, MAPS_STOPS = { x: 0.145, y: 0.07, w: 0.72, h: 0.105 };
+
+// Returns that part of the screen as dark text on a light background.
+async function mapsPanel(file, width, box) {
   const url = URL.createObjectURL(file);
   try {
     const img = await loadImage(url);
-    const top = Math.round(img.naturalHeight * 0.6), h = img.naturalHeight - top;
-    const scale = width / img.naturalWidth;
+    const sx = img.naturalWidth * box.x, sy = img.naturalHeight * box.y, sw = img.naturalWidth * box.w, sh = img.naturalHeight * box.h;
+    const scale = width / sw;
     const c = document.createElement('canvas');
     c.width = width;
-    c.height = Math.round(h * scale);
+    c.height = Math.round(sh * scale);
     const g = c.getContext('2d');
-    g.drawImage(img, 0, top, img.naturalWidth, h, 0, 0, c.width, c.height);
+    g.drawImage(img, sx, sy, sw, sh, 0, 0, c.width, c.height);
     const shot = g.getImageData(0, 0, c.width, c.height), px = shot.data;
     let total = 0;
     for (let i = 0; i < px.length; i += 4) total += (px[i] + px[i + 1] + px[i + 2]) / 3;
@@ -850,7 +860,9 @@ function loadScript(src) {
 
 // Reads the screen at two sizes. A misread digit rarely repeats, so a disagreement means the figures need checking.
 async function readMapsScreen(file) {
-  const large = await mapsPanel(file, 2000), small = await mapsPanel(file, 1200);
+  const [large, small, stopsLarge, stopsSmall] = await Promise.all([
+    mapsPanel(file, 2000, MAPS_ROUTE), mapsPanel(file, 1200, MAPS_ROUTE), mapsPanel(file, 1500, MAPS_STOPS), mapsPanel(file, 900, MAPS_STOPS),
+  ]);
   if (!window.Tesseract) await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
   const worker = await Tesseract.createWorker('eng');
   try {
@@ -858,7 +870,10 @@ async function readMapsScreen(file) {
     const second = parseMapsText((await worker.recognize(small)).data.text);
     const got = first || second;
     if (!got) return null;
-    return { ...got, unsure: got.several || !first || !second || first.km !== second.km || first.toll !== second.toll };
+    const place = parseMapsPlace((await worker.recognize(stopsLarge)).data.text);
+    // A wrong place name is worse than an empty field, so the two readings must agree.
+    const to = place && place === parseMapsPlace((await worker.recognize(stopsSmall)).data.text) ? place : '';
+    return { ...got, to, unsure: got.several || !first || !second || first.km !== second.km || first.toll !== second.toll };
   } finally { worker.terminate(); }
 }
 
@@ -874,13 +889,16 @@ async function readScreenshot(ev, leg, file) {
     try { got = await readMapsScreen(file); }
     catch (e) { setStatus('Could not read that screenshot. Check your internet connection, or type the distance and toll.', true); return; }
     if (!got) { setStatus('No distance found. Use a Google Maps directions screenshot, or type the distance and toll.', true); return; }
+    const placed = got.to && !leg.to.trim() ? got.to : '';
+    if (placed) leg.to = placed;
     leg.km = got.km;
     if (got.toll) {
       leg.rows = leg.rows.filter(r => r.type !== 'toll');
       leg.rows.unshift({ ...newRow('toll', 'Toll'), val: got.toll });
     }
     if (!await addImages(ev, leg, [file])) return;
-    const filled = got.toll ? `Filled in ${got.km} km and ${rupiah(+got.toll)} toll` : `Filled in ${got.km} km. No toll amount shown, so Toll stays as it was`;
+    const where = placed ? `${placed}, ` : '';
+    const filled = got.toll ? `Filled in ${where}${got.km} km and ${rupiah(+got.toll)} toll` : `Filled in ${where}${got.km} km. No toll amount shown, so Toll stays as it was`;
     setStatus(got.unsure ? `${filled}. The screenshot was hard to read, so compare these figures with it.` : `${filled}. Please check.`, got.unsure);
   } finally { reading = false; }
 }
