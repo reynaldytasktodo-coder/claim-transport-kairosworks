@@ -11,14 +11,17 @@
 <link rel="manifest" href="manifest.json">
 <title>Claim Transport</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" id="theme-fonts" href="data:text/css,">
+<script>try { const r = document.documentElement, t = localStorage.getItem('ct-theme'), p = localStorage.getItem('ct-partner'); if (t && t !== 'kairos') r.dataset.theme = t; if (p) r.dataset.partner = p; } catch (e) {}</script>
 <style>
-/* Layout: a phone-style app column. Red curved header, floating white cards, bottom bar with a raised add button. One deliberate light look. */
+/* Layout: a phone-style app column. Red curved header, floating white cards, bottom bar with a raised add button. The other themes at the end of this sheet restyle the same layout. */
 :root {
   color-scheme: light;
   --bg: #f6f3f3; --surface: #ffffff; --field: #f6f1f1; --fg: #231a1b; --muted: #75696a;
   --line: #eee6e6; --brand: #cb3a3a; --brand-deep: #a92b2c; --on-brand: #ffffff; --tint: #fbe6e4;
   --warn: #8a5a00; --warn-bg: #fdf1d8; --danger: #b3261e; --shadow: 0 6px 22px rgba(120, 40, 40, .10);
   --sans: "Manrope", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --hero-bg: var(--brand); --hero-fg: var(--on-brand); --recap-hero: var(--brand); --proof-line: #e3c9c7; --toast-bg: var(--fg); --toast-fg: #fff;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -48,18 +51,18 @@ label.f { display: grid; gap: 5px; font-size: 13px; font-weight: 600; color: var
 h1, h2, h3 { margin: 0; text-wrap: balance; }
 
 /* Header */
-.hero { background: var(--brand); color: var(--on-brand); border-radius: 0 0 30px 30px; padding-top: calc(18px + env(safe-area-inset-top, 0px)); padding-bottom: 54px; display: grid; gap: 14px; }
+.hero { background: var(--hero-bg); color: var(--hero-fg); border-radius: 0 0 30px 30px; padding-top: calc(18px + env(safe-area-inset-top, 0px)); padding-bottom: 54px; display: grid; gap: 14px; }
 .hero.small { padding-bottom: 46px; }
 .hero-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
 .hero-top > div { min-width: 0; flex: 1; }
 .hero h1 { font-size: 22px; font-weight: 800; line-height: 1.2; overflow-wrap: anywhere; }
 .hero small { font-size: 13px; opacity: .88; }
-.round { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 255, 255, .18); color: var(--on-brand); flex: none; font-size: 12px; font-weight: 700; }
+.round { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 255, 255, .18); color: var(--hero-fg); flex: none; font-size: 12px; font-weight: 700; }
 .round.armed { background: var(--on-brand); color: var(--danger); width: auto; border-radius: 21px; padding: 0 14px; }
 .grand { display: grid; gap: 1px; }
 .grand span { font-size: 13px; opacity: .9; }
 .grand b { font-size: 34px; font-weight: 800; line-height: 1.15; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
-.lift { margin-top: -30px; display: grid; gap: 14px; }
+.lift { position: relative; margin-top: -30px; display: grid; gap: 14px; }
 
 /* Cards */
 .card { background: var(--surface); border-radius: 20px; box-shadow: var(--shadow); padding: 16px; display: grid; gap: 12px; min-width: 0; }
@@ -81,6 +84,7 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .claim-main b { font-weight: 800; font-size: 15px; overflow-wrap: anywhere; }
 .claim-main small { color: var(--muted); font-size: 12.5px; overflow-wrap: anywhere; }
 .claim-amt { font-weight: 800; font-size: 14px; text-align: right; font-variant-numeric: tabular-nums; }
+.claim-amt small { display: block; font-weight: 600; font-size: 11.5px; color: var(--muted); }
 .chip { white-space: nowrap; display: inline-block; width: fit-content; font-size: 11.5px; font-weight: 700; padding: 2px 9px; border-radius: 99px; background: var(--warn-bg); color: var(--warn); }
 .empty { text-align: center; color: var(--muted); padding: 36px 20px; display: grid; gap: 10px; justify-items: center; }
 .empty .tile { width: 64px; height: 64px; border-radius: 20px; background: var(--tint); color: var(--brand); display: grid; place-items: center; }
@@ -107,7 +111,7 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .quiet { min-height: 36px; padding: 0 10px; border-radius: 18px; color: var(--muted); font-size: 13px; font-weight: 700; }
 .total { display: flex; justify-content: space-between; align-items: center; gap: 10px; background: var(--tint); border-radius: 14px; padding: 11px 14px; font-weight: 800; }
 .total b { color: var(--brand-deep); font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; }
-.proof { display: grid; gap: 10px; padding: 12px; border: 1.5px dashed #e3c9c7; border-radius: 16px; }
+.proof { display: grid; gap: 10px; padding: 12px; border: 1.5px dashed var(--proof-line); border-radius: 16px; }
 .proof.drag { border-color: var(--brand); background: var(--tint); }
 .proof p { margin: 0; font-size: 12.5px; color: var(--muted); }
 .proof h4 { margin: 0; font-size: 14px; font-weight: 800; }
@@ -149,9 +153,130 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .donebar small { display: block; font-size: 12px; color: var(--muted); }
 .donebar b { font-size: 19px; font-weight: 800; color: var(--brand-deep); font-variant-numeric: tabular-nums; }
 .donebar .cta { width: auto; padding: 0 28px; min-height: 48px; }
-.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(100px + env(safe-area-inset-bottom, 0px)); width: max-content; max-width: min(92vw, 500px); z-index: 6; background: var(--fg); color: #fff; font-size: 13.5px; font-weight: 600; border-radius: 14px; padding: 10px 14px; box-shadow: 0 6px 20px rgba(0, 0, 0, .25); }
-.toast.err { background: var(--danger); }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(100px + env(safe-area-inset-bottom, 0px)); width: max-content; max-width: min(92vw, 500px); z-index: 6; background: var(--toast-bg); color: var(--toast-fg); font-size: 13.5px; font-weight: 600; border-radius: 14px; padding: 10px 14px; box-shadow: 0 6px 20px rgba(0, 0, 0, .25); }
+.toast.err { background: var(--danger); color: #fff; }
 @media (pointer: coarse) { .desk-only { display: none; } }
+
+/* Celebrations and the monthly recap */
+.mascot { display: none; position: absolute; right: max(16px, env(safe-area-inset-right, 0px)); bottom: 40px; pointer-events: none; }
+.hero { position: relative; }
+.hero > * { position: relative; }
+.hero > .mascot { position: absolute; }
+.sprite { display: block; shape-rendering: crispEdges; }
+[data-theme="playful"] #grand-note, [data-theme="pixel"] #grand-note, [data-theme="monster"] #grand-note { padding-right: 92px; }
+.trip { position: fixed; z-index: 7; top: calc(78px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); width: min(calc(100% - 32px), 480px); pointer-events: none; display: grid; gap: 6px; background: var(--surface); color: var(--fg); border-radius: 16px; padding: 10px 14px; box-shadow: 0 10px 28px rgba(0, 0, 0, .28); font-size: 14px; text-align: center; animation: trip-fade 2s both; }
+.trip b { font-weight: 800; }
+.trip-track { position: relative; height: 34px; border-bottom: 3px dashed var(--brand); }
+.trip-car { position: absolute; bottom: 1px; left: 0; color: var(--brand); animation: trip-drive .9s cubic-bezier(.3, .1, .3, 1) both; }
+.trip-car .ic { width: 30px; height: 30px; }
+.trip-pin { position: absolute; right: 0; bottom: 2px; }
+@keyframes trip-fade { 0% { opacity: 0; } 8%, 88% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes trip-drive { from { left: 0; } to { left: calc(100% - 58px); } }
+.confetti { position: fixed; top: -14px; z-index: 8; width: 9px; height: 13px; pointer-events: none; }
+.recap { border: 0; padding: 14px; width: min(calc(100% - 24px), 440px); max-height: calc(100% - 24px); border-radius: 22px; background: var(--surface); color: var(--fg); }
+.recap::backdrop { background: rgba(0, 0, 0, .65); }
+.recap[open] { display: grid; gap: 12px; }
+.recap img { width: 100%; display: block; border-radius: 14px; }
+
+/* Themes. The PDF always keeps the company look. */
+.theme-opt { display: flex; align-items: center; gap: 12px; min-height: 56px; cursor: pointer; }
+.theme-opt input { width: 20px; height: 20px; min-height: 0; padding: 0; flex: none; accent-color: var(--brand); }
+.theme-swatch { width: 44px; height: 44px; flex: none; border-radius: 12px; border: 2px solid rgba(0, 0, 0, .18); }
+.theme-opt b { display: block; font-weight: 800; font-size: 14.5px; }
+.theme-opt small { display: block; color: var(--muted); font-size: 12.5px; }
+.partners { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.partner { display: grid; justify-items: center; gap: 2px; text-align: center; font-size: 12.5px; font-weight: 700; padding: 8px 4px; border-radius: 12px; background: var(--field); cursor: pointer; }
+.partner input { width: 18px; height: 18px; min-height: 0; padding: 0; accent-color: var(--brand); }
+
+/* Neon Future */
+:root[data-theme="future"] {
+  color-scheme: dark;
+  --bg: #080c18; --surface: #121a2e; --field: #1b2540; --fg: #eaf2ff; --muted: #a3b4d2; --line: #26324f;
+  --brand: #22d3ee; --brand-deep: #7dedfc; --on-brand: #04141c; --tint: #12324a; --warn: #fcd34d; --warn-bg: #3b2f0a; --danger: #ff9a9a;
+  --shadow: 0 8px 28px rgba(0, 0, 0, .45); --sans: "Space Grotesk", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --hero-fg: #ffffff; --recap-hero: #2b1a8a; --proof-line: #2f3f63; --toast-bg: #eaf2ff; --toast-fg: #08101f;
+  --hero-bg: linear-gradient(rgba(255, 255, 255, .07) 1px, transparent 1px) 0 0 / 100% 22px, linear-gradient(90deg, rgba(255, 255, 255, .07) 1px, transparent 1px) 0 0 / 22px 100%, linear-gradient(135deg, #3b1fa8, #0b6e93);
+}
+[data-theme="future"] .card, [data-theme="future"] .claim { border: 1px solid rgba(34, 211, 238, .22); }
+[data-theme="future"] .cta, [data-theme="future"] .fab { box-shadow: 0 0 20px rgba(34, 211, 238, .55); }
+[data-theme="future"] .promo { background: var(--tint); color: var(--fg); }
+[data-theme="future"] .toast.err { color: #08101f; }
+[data-theme="future"] .grand b { text-shadow: 0 0 18px rgba(125, 237, 252, .75); }
+[data-theme="future"] select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2322d3ee' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); }
+[data-theme="future"] .enter .hero, [data-theme="future"] .enter .lift { animation: enter-fade .35s ease-out both; }
+
+/* Playful */
+:root[data-theme="playful"] {
+  --bg: #fff6df; --surface: #ffffff; --field: #f3edff; --fg: #25164f; --muted: #5f5185; --line: #e8dff8;
+  --brand: #6d35e8; --brand-deep: #4d1fbf; --on-brand: #ffffff; --tint: #ffe9a8; --warn: #7a4b00; --warn-bg: #ffe3a3;
+  --shadow: 0 5px 0 #25164f; --sans: "Fredoka", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --recap-hero: #6d35e8; --proof-line: #b9a4ee;
+  --hero-bg: radial-gradient(circle at 12% 30%, #8d5cf5 0 34px, transparent 35px), radial-gradient(circle at 88% 16%, #ff7ab8 0 22px, transparent 23px), radial-gradient(circle at 70% 88%, #8d5cf5 0 44px, transparent 45px), #6d35e8;
+}
+[data-theme="playful"] .card, [data-theme="playful"] .claim, [data-theme="playful"] .add-routes .pill { border: 2.5px solid #25164f; }
+[data-theme="playful"] .cta { box-shadow: 0 4px 0 #25164f; border: 2.5px solid #25164f; }
+[data-theme="playful"] .fab { background: #ffc83d; color: #25164f; border-color: #25164f; box-shadow: 0 4px 0 #25164f; }
+[data-theme="playful"] button:active, [data-theme="playful"] .pill:active { transform: translateY(3px) scale(.97); }
+[data-theme="playful"] .mascot { display: grid; place-items: center; width: 62px; height: 62px; border-radius: 50%; background: #ffc83d; color: #25164f; border: 2.5px solid #25164f; animation: bounce 1.1s ease-in-out infinite; }
+[data-theme="playful"] .mascot .ic { width: 36px; height: 36px; }
+[data-theme="playful"] .enter .hero { animation: enter-pop .45s cubic-bezier(.3, 1.6, .5, 1) both; }
+[data-theme="playful"] .enter .lift { animation: enter-pop .5s .05s cubic-bezier(.3, 1.6, .5, 1) both; }
+[data-theme="playful"] select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236d35e8' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); }
+
+/* Pixel Adventure. VT323 because its 2, 5, 6 and 8 stay easy to tell apart, which matters on an app about money. */
+[data-theme="pixel"] body, [data-theme="monster"] body, [data-theme="pixel"] input, [data-theme="pixel"] select, [data-theme="monster"] input, [data-theme="monster"] select { font-size-adjust: .6; }
+:root[data-theme="pixel"] {
+  --bg: #5c94fc; --surface: #fff7d6; --field: #fdebb0; --fg: #1c1208; --muted: #57452a; --line: #d9c48a;
+  --brand: #b83a08; --brand-deep: #8e2a06; --on-brand: #ffffff; --tint: #ffd98a; --warn: #4f3300; --warn-bg: #ffe07a; --danger: #a31c14;
+  --shadow: 4px 4px 0 rgba(0, 0, 0, .4); --sans: "VT323", ui-monospace, Menlo, monospace;
+  --recap-hero: #b5410f; --proof-line: #1c1208;
+  --hero-bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='32'%3E%3Crect width='48' height='32' fill='%23b5410f'/%3E%3Cpath d='M0 0h48v3H0zM0 16h48v3H0zM22 0h3v16h-3zM0 16h3v16H0zM45 16h3v16h-3z' fill='%23762706'/%3E%3C/svg%3E");
+}
+[data-theme="pixel"] *:not(input[type="radio"]):not(input[type="checkbox"]) { border-radius: 0 !important; }
+[data-theme="pixel"] body::before { content: ""; position: fixed; inset: 0; z-index: -1; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='300' shape-rendering='crispEdges'%3E%3Cpath d='M50 120h12v-12h12v-12h36v12h12v12h12v12H38v-12zM230 240h12v-12h36v12h12v12h12v12H218v-12h12z' fill='%23fff'/%3E%3C/svg%3E"); animation: clouds 60s steps(120) infinite; }
+[data-theme="pixel"] .hero h1 { font: 400 16px/1.5 "Press Start 2P", monospace; font-size-adjust: none; }
+[data-theme="pixel"] .grand b { font-size: 38px; }
+[data-theme="pixel"] .hero { border-bottom: 4px solid #1c1208; }
+[data-theme="pixel"] .hero small, [data-theme="pixel"] .grand span { opacity: 1; }
+[data-theme="pixel"] .card, [data-theme="pixel"] .claim, [data-theme="pixel"] .notice, [data-theme="pixel"] .promo, [data-theme="pixel"] .cta, [data-theme="pixel"] .outline, [data-theme="pixel"] .add-routes .pill, [data-theme="pixel"] .recap { border: 3px solid #1c1208; }
+[data-theme="pixel"] .cta, [data-theme="pixel"] .outline, [data-theme="pixel"] .promo, [data-theme="pixel"] .notice { box-shadow: var(--shadow); }
+[data-theme="pixel"] .section-title h2, [data-theme="pixel"] .section-title span { color: #ffffff; text-shadow: 2px 2px 0 #1c1208; }
+[data-theme="pixel"] .nav, [data-theme="pixel"] .donebar { border-top: 4px solid #1c1208; box-shadow: none; }
+[data-theme="pixel"] .fab { background: #f8b800; color: #1c1208; border: 4px solid #1c1208; box-shadow: 4px 4px 0 rgba(0, 0, 0, .4); }
+[data-theme="pixel"] button:active, [data-theme="pixel"] .pill:active { transform: translate(2px, 2px); }
+[data-theme="pixel"] .mascot { display: block; animation: hop 1s steps(4) infinite; }
+[data-theme="pixel"] .trip, [data-theme="monster"] .trip { border: 3px solid #1c1208; }
+[data-theme="pixel"] .enter .hero, [data-theme="pixel"] .enter .lift { animation: enter-step .32s steps(4) both; }
+[data-theme="pixel"] select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' shape-rendering='crispEdges' viewBox='0 0 16 16'%3E%3Cpath d='M3 5h10v2h-2v2H9v2H7V9H5V7H3z' fill='%231c1208'/%3E%3C/svg%3E"); }
+
+/* Monster Partner. The partner choice sets the colours. */
+:root[data-theme="monster"] {
+  --bg: #e4f1cf; --surface: #fbfbf2; --field: #eeecdf; --fg: #24242f; --muted: #55555f; --line: #d8d6c6;
+  --warn: #5e4200; --warn-bg: #fbe7a0; --shadow: 0 3px 0 rgba(0, 0, 0, .22); --sans: "VT323", ui-monospace, Menlo, monospace;
+  --brand: #c23f0c; --brand-deep: #93300a; --tint: #ffe3d1; --on-brand: #ffffff; --recap-hero: var(--brand); --proof-line: #3a3a4a;
+}
+:root[data-theme="monster"][data-partner="leaf"] { --brand: #277a42; --brand-deep: #1c5e32; --tint: #d6f2dc; }
+:root[data-theme="monster"][data-partner="wave"] { --brand: #1d6fd6; --brand-deep: #114e9f; --tint: #d8e9ff; }
+[data-theme="monster"] body { background-image: conic-gradient(#d8e9bd 25%, transparent 0 50%, #d8e9bd 0 75%, transparent 0); background-size: 32px 32px; }
+[data-theme="monster"] .hero h1 { font-size: 25px; font-weight: 700; }
+[data-theme="monster"] .grand b { font-size: 37px; }
+[data-theme="monster"] .card, [data-theme="monster"] .claim, [data-theme="monster"] .add-routes .pill, [data-theme="monster"] .recap { border: 3px solid #3a3a4a; border-radius: 10px; box-shadow: inset 0 0 0 2px var(--tint), var(--shadow); }
+[data-theme="monster"] .cta { border: 3px solid #3a3a4a; border-radius: 10px; }
+[data-theme="monster"] .fab { border-color: #3a3a4a; }
+[data-theme="monster"] .mascot { display: block; animation: hop 1.2s steps(4) infinite; }
+[data-theme="monster"] .mascot::after { content: ""; display: block; width: 64px; height: 10px; margin: 0 auto; border-radius: 50%; background: rgba(0, 0, 0, .28); }
+[data-theme="monster"] .enter .hero, [data-theme="monster"] .enter .lift { animation: enter-step .32s steps(4) both; }
+
+@keyframes enter-fade { from { opacity: 0; } }
+@keyframes enter-pop { from { opacity: 0; transform: translateY(14px) scale(.97); } }
+@keyframes enter-step { from { opacity: 0; transform: translateY(12px); } }
+@keyframes bounce { 50% { transform: translateY(-7px) rotate(-6deg); } }
+@keyframes hop { 50% { transform: translateY(-6px); } }
+@keyframes clouds { to { background-position-x: 360px; } }
+@media (prefers-reduced-motion: reduce) {
+  .mascot, .trip-car, .enter .hero, .enter .lift, [data-theme="pixel"] body::before { animation: none !important; }
+  .trip-car { left: calc(100% - 58px); }
+}
 </style>
 </head>
 <body>
@@ -180,7 +305,8 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
         <div><small id="greeting">Work travel claims</small><h1>Claim Transport</h1></div>
         <button class="round" data-go="settings" aria-label="Settings"><svg class="ic"><use href="#i-gear"/></svg></button>
       </div>
-      <div class="grand"><span>Total claims this month</span><b id="grand">Rp 0</b><span id="grand-note">0 routes</span></div>
+      <div class="grand"><span>You'll get back this month</span><b id="grand">Rp 0</b><span id="grand-note">0 routes</span></div>
+      <span class="mascot" id="mascot" aria-hidden="true"></span>
     </header>
     <div class="lift gut">
       <div class="card month">
@@ -208,11 +334,14 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
       <div class="card">
         <div id="summary-list"></div>
         <div class="total"><span>Total claims</span><b id="summary-total">Rp 0</b></div>
+        <div class="total"><span>You'll get back</span><b id="summary-back">Rp 0</b></div>
+        <p class="note">Technical Meeting claims are paid back at 100%, and all other claims at 70%.</p>
       </div>
       <div class="card">
         <label class="check"><input type="checkbox" id="summary" checked>Include a summary page in the PDF</label>
         <button class="cta" id="share" hidden><svg class="ic"><use href="#i-share"/></svg>Share PDF</button>
         <button class="cta" id="pdf"><svg class="ic"><use href="#i-pdf"/></svg>Download PDF</button>
+        <button class="outline" id="recap">Monthly recap</button>
       </div>
     </div>
   </section>
@@ -243,6 +372,15 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
         <label class="f">Name on PDF<input id="employee" autocomplete="name"></label>
       </div>
       <div class="card">
+        <h2 style="font-size:15px;font-weight:800">Theme</h2>
+        <div id="theme-list"></div>
+        <p class="note">Changes how the app looks on this device. The PDF always keeps the company look.</p>
+      </div>
+      <div class="card" id="partner-card" hidden>
+        <h2 style="font-size:15px;font-weight:800">Choose your partner</h2>
+        <div class="partners" id="partner-list"></div>
+      </div>
+      <div class="card">
         <h2 style="font-size:15px;font-weight:800">Storage and backup</h2>
         <p class="note">Claims and proof are saved only in this browser on this device, and do not sync to other devices. They can be lost if browser data is cleared or the device is replaced, so back up regularly and keep the PDFs you download.</p>
         <p class="note" id="backup-note"></p>
@@ -263,6 +401,13 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
   <button class="tab" data-go="settings"><i><svg class="ic"><use href="#i-gear"/></svg></i>Settings</button>
 </nav>
 <div class="toast" id="status" role="status" hidden></div>
+<dialog class="recap" id="recap-dialog" aria-label="Monthly recap">
+  <img id="recap-img" alt="">
+  <div class="backup-actions">
+    <button class="outline" id="recap-close">Close</button>
+    <button class="cta" id="recap-share">Share image</button>
+  </div>
+</dialog>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
@@ -276,7 +421,7 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 const rupiah = n => 'Rp ' + Math.round(n).toLocaleString('en-US');
 
-let events = [], settings = { rate: DEFAULT_RATE, summary: true, name: '', lastBackup: '', routes: [] }, viewMonth = '', showingExample = false;
+let events = [], settings = { rate: DEFAULT_RATE, summary: true, name: '', lastBackup: '', routes: [], theme: 'kairos', partner: 'flame' }, viewMonth = '', showingExample = false;
 
 /* ---------- Amounts ---------- */
 
@@ -300,6 +445,8 @@ const legFare = (ev, leg) => isCar(leg) ? Math.round((parseFloat(String(leg.km).
 const rowAmount = (ev, row) => sum(parseParts(row.val, ev.rate)) * (row.type === 'promo' ? -1 : 1);
 const legTotal = (ev, leg) => legFare(ev, leg) + leg.rows.reduce((a, r) => a + rowAmount(ev, r), 0);
 const eventTotal = ev => ev.legs.reduce((a, l) => a + legTotal(ev, l), 0);
+const backShare = ev => /^technical meeting$/i.test((ev.kind || '').trim()) ? 1 : 0.7;
+const eventBack = ev => Math.round(eventTotal(ev) * backShare(ev));
 const fmtDate = d => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(d || ''); return m ? `${+m[3]} ${MONTHS[+m[2] - 1]} ${m[1]}` : ''; };
 const routeText = leg => `${leg.from || '…'} - ${leg.to || '…'}`;
 
@@ -517,7 +664,7 @@ function detailHtml(ev) {
       </div>
     </div>
     <div class="donebar">
-      <div><small>Total for this claim</small><b data-evtotal></b></div>
+      <div><small>Total for this claim</small><b data-evtotal></b><small data-evback></small></div>
       <button class="cta" data-act="done">Done</button>
     </div>
   </div>`;
@@ -533,7 +680,7 @@ function claimHtml(ev) {
       <small>${plural(ev.legs.length, 'route')}${ev.venue ? ' · ' + esc(ev.venue) : ''}</small>
       ${missing ? `<span class="chip">${missing} without proof</span>` : ''}
     </span>
-    <span class="claim-amt">${esc(rupiah(eventTotal(ev)))}</span>
+    <span class="claim-amt">${esc(rupiah(eventTotal(ev)))}<small>${backShare(ev) * 100}% · ${esc(rupiah(eventBack(ev)))}</small></span>
   </button>`;
 }
 
@@ -579,12 +726,14 @@ function recalc() {
       }
     }
     card.querySelector('[data-evtotal]').textContent = rupiah(eventTotal(ev));
+    card.querySelector('[data-evback]').textContent = `You get back ${rupiah(eventBack(ev))} (${backShare(ev) * 100}%)`;
   }
   const list = inMonth(), legs = list.flatMap(e => e.legs), missing = legs.filter(l => !l.images.length).length;
-  const total = rupiah(list.reduce((a, e) => a + eventTotal(e), 0));
-  $('grand').textContent = total;
+  const total = rupiah(list.reduce((a, e) => a + eventTotal(e), 0)), back = list.reduce((a, e) => a + eventBack(e), 0);
+  setGrand(back);
   $('summary-total').textContent = total;
-  $('grand-note').textContent = `${plural(list.length, 'client')}, ${plural(legs.length, 'route')}`;
+  $('summary-back').textContent = rupiah(back);
+  $('grand-note').textContent = `${total} claimed · ${plural(list.length, 'client')}, ${plural(legs.length, 'route')}`;
   $('missing-note').hidden = !missing || showingExample;
   $('missing-text').textContent = `${plural(missing, 'route')} without proof. Add it before downloading the PDF.`;
 }
@@ -596,9 +745,21 @@ function show(next) {
   document.querySelectorAll('.tab[data-go]').forEach(t => t.classList.toggle('on', t.dataset.go === view));
   render();
   window.scrollTo(0, 0);
+  // Only the moment a screen opens is animated, not each later redraw of it.
+  const section = $(`view-${view}`);
+  section.classList.add('enter');
+  clearTimeout(enterTimer);
+  enterTimer = setTimeout(() => section.classList.remove('enter'), 600);
 }
 
-function openClaim(id) { openId = id; show('detail'); }
+let enterTimer, openedTotal = 0, openedBack = 0;
+function openClaim(id) {
+  const ev = events.find(e => e.id === id);
+  openedTotal = ev ? eventTotal(ev) : 0;
+  openedBack = ev ? eventBack(ev) : 0;
+  openId = id;
+  show('detail');
+}
 
 function shiftMonth(delta) {
   const [y, m] = viewMonth.split('-').map(Number), d = new Date(y, m - 1 + delta, 1);
@@ -713,7 +874,7 @@ $('list').addEventListener('click', async e => {
   if (!btn) return;
   const ev = findEv(btn), leg = findLeg(ev, btn), act = btn.dataset.act;
   let focusId = null;
-  if (act === 'done') { show('home'); return; }
+  if (act === 'done') { celebrateDone(ev); show('home'); return; }
   if (act === 'save-route') { saveRoute(ev, leg); return; }
   if (act === 'add-row') leg.rows.push(newRow(btn.dataset.type, btn.dataset.label));
   else if (act === 'del-row') leg.rows = leg.rows.filter(r => r !== findRow(leg, btn));
@@ -1132,6 +1293,7 @@ async function downloadPdf() {
     const pdf = await createPdf(list);
     saveFile(pdf.filename, pdf.blob);
     setStatus(`${pdf.filename} downloaded`);
+    confetti();
   } catch (e) {
     pdfError();
   } finally { pdfBusy = false; }
@@ -1151,6 +1313,7 @@ async function sharePdf() {
     }
     await navigator.share({ files: [new File([pdf.blob], pdf.filename, { type: 'application/pdf' })], title: pdf.filename });
     setStatus('PDF shared');
+    confetti();
   } catch (e) {
     if (e.name === 'AbortError') $('status').hidden = true;
     else if (e.name === 'NotAllowedError') setStatus('Your PDF is ready. Tap Share PDF again to send it.');
@@ -1267,6 +1430,214 @@ $('restore-file').addEventListener('change', e => {
 });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushSaves(); });
 
+/* ---------- Themes and pixel sprites ---------- */
+
+const THEMES = {
+  kairos: { name: 'Kairos', note: 'Company colors', swatch: '#cb3a3a', color: '#cb3a3a', confetti: ['#cb3a3a', '#a92b2c', '#f6c945', '#fbe6e4'] },
+  future: { name: 'Neon Future', note: 'Dark, modern and glowing', swatch: 'linear-gradient(135deg,#3b1fa8,#22d3ee)', color: '#3b1fa8', fonts: 'Space+Grotesk:wght@500;600;700', confetti: ['#22d3ee', '#a78bfa', '#7dedfc', '#f0abfc'] },
+  playful: { name: 'Playful', note: 'Bright and bouncy, like a game', swatch: 'linear-gradient(135deg,#6d35e8,#ffc83d)', color: '#6d35e8', fonts: 'Fredoka:wght@500;600;700', confetti: ['#6d35e8', '#ffc83d', '#ff7ab8', '#37c8a0'] },
+  pixel: { name: 'Pixel Adventure', note: 'Retro platform game, with bricks and coins', swatch: 'linear-gradient(#5c94fc 60%,#b5410f 60%)', color: '#b5410f', fonts: 'VT323&family=Press+Start+2P', confetti: ['#f8b800', '#ffd84d', '#c98a00'] },
+  monster: { name: 'Monster Partner', note: 'Retro monster game, with a partner you choose', swatch: 'linear-gradient(135deg,#277a42,#c23f0c 50%,#1d6fd6)', color: null, fonts: 'VT323', confetti: ['#f8d030', '#f85888', '#78c850', '#6890f0'] },
+};
+
+// Original creatures made for this app. Each one is drawn on a shared body with its own features on top.
+const CREATURE_BODY = ['.....kkkkkk.....', '...kkBBBBBBkk...', '..kBBBBBBBBBBk..', '.kBBBBBBBBBBBBk.', '.kBBwkBBBBwkBBk.', 'kBBBwkBBBBwkBBBk', 'kBBBBBBBBBBBBBBk', 'kBBBBBkkkkBBBBBk', 'kBBBBBBBBBBBBBBk', '.kBBLLLLLLLLBBk.', '.kBLLLLLLLLLLBk.', '..kLLLLLLLLLLk..', '..kkBkkkkkkBkk..', '..kBBk....kBBk..', '..kkkk....kkkk..'];
+const PARTNERS = {
+  leaf: { name: 'Sprigling', color: '#277a42', palette: { k: '#17331f', B: '#6cc07a', L: '#d8f0c0', w: '#ffffff', G: '#2f9e44', D: '#1c6e30' },
+    parts: [[8, 0, '..kkk.......kkk..'], [6, 1, '.kGGGk..kGGGk'], [6, 2, 'kGDGGGkkGGGDGk'], [7, 3, 'kkGGGkkGGGkk'], [9, 4, 'kkkkkkkk']] },
+  flame: { name: 'Emberpup', color: '#c23f0c', palette: { k: '#3a1606', B: '#f28a30', L: '#ffe2b8', w: '#ffffff', R: '#e8340c', Y: '#ffd23c' },
+    parts: [[3, 2, 'kk..........kk'], [3, 3, 'kBBk........kBBk'.slice(0, 16)], [3, 4, 'kBBBk......kBBBk'], [18, 5, '.k'], [17, 6, 'kRk'], [17, 7, 'kRYk'], [17, 8, 'kRYRk'.slice(0, 3)], [17, 9, 'kRk'], [17, 10, 'kBk'], [17, 11, 'kBk']] },
+  wave: { name: 'Ripplet', color: '#1d6fd6', palette: { k: '#0c2a55', B: '#58a8f0', L: '#e2f2ff', w: '#ffffff', C: '#a8ddff', S: '#2d7fd8' },
+    parts: [[9, 1, 'kk'], [8, 2, 'kCCk'], [8, 3, 'kSCk'], [8, 4, 'kkkk'], [0, 9, '.kk'], [0, 10, 'kSSk'], [0, 11, '.kSk'], [16, 9, 'kk.'], [16, 10, 'kSSk'], [16, 11, 'kSk']] },
+};
+const PIXEL_CAR = { w: 16, palette: { k: '#1c1208', r: '#d8280c', d: '#8e1a06', w: '#bfe6ff', g: '#9a9a9a' },
+  rows: ['................', '....kkkkkkkk....', '...krwwwrwwwk...', '..krrwwwrwwwrk..', '.kkkkkkkkkkkkkk.', 'krrrrrrrrrrrrrrk', 'krdrrrrrrrrrrdrk', 'krrkkkrrrrkkkrrk', 'kkkkgkkkkkkgkkkk', '...kkk....kkk...'] };
+
+function creatureGrid(id) {
+  const grid = Array.from({ length: 20 }, () => Array(20).fill('.'));
+  CREATURE_BODY.forEach((row, y) => [...row].forEach((c, x) => { if (c !== '.') grid[y + 5][x + 2] = c; }));
+  for (const [x, y, row] of PARTNERS[id].parts) [...row].forEach((c, i) => { if (c !== '.' && x + i < 20) grid[y][x + i] = c; });
+  return { rows: grid.map(r => r.join('')), palette: PARTNERS[id].palette };
+}
+function spriteHtml({ rows, palette }, cell) {
+  const w = rows[0].length, h = rows.length;
+  let rects = '';
+  rows.forEach((row, y) => [...row].forEach((c, x) => { if (palette[c]) rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${palette[c]}"/>`; }));
+  return `<svg class="sprite" width="${w * cell}" height="${h * cell}" viewBox="0 0 ${w} ${h}" aria-hidden="true">${rects}</svg>`;
+}
+function drawSprite(g, { rows, palette }, x, y, cell) {
+  rows.forEach((row, r) => [...row].forEach((c, i) => { if (palette[c]) { g.fillStyle = palette[c]; g.fillRect(x + i * cell, y + r * cell, cell, cell); } }));
+}
+const themeSprite = () => settings.theme === 'monster' ? creatureGrid(settings.partner) : settings.theme === 'pixel' ? PIXEL_CAR : null;
+
+function applyTheme() {
+  const theme = THEMES[settings.theme] ? settings.theme : 'kairos', partner = PARTNERS[settings.partner] ? settings.partner : 'flame', root = document.documentElement;
+  settings.theme = theme;
+  settings.partner = partner;
+  if (theme === 'kairos') delete root.dataset.theme; else root.dataset.theme = theme;
+  root.dataset.partner = partner;
+  document.querySelector('meta[name="theme-color"]').content = THEMES[theme].color || PARTNERS[partner].color;
+  $('theme-fonts').href = THEMES[theme].fonts ? `https://fonts.googleapis.com/css2?family=${THEMES[theme].fonts}&display=swap` : 'data:text/css,';
+  const sprite = themeSprite();
+  $('mascot').innerHTML = sprite ? spriteHtml(sprite, theme === 'monster' ? 4 : 5) : ic('car');
+  $('partner-card').hidden = theme !== 'monster';
+  try { localStorage.setItem('ct-theme', theme); localStorage.setItem('ct-partner', partner); } catch (e) {}
+}
+
+function renderThemeOptions() {
+  $('theme-list').innerHTML = Object.entries(THEMES).map(([id, t]) => `<label class="theme-opt"><input type="radio" name="theme" value="${id}"${id === settings.theme ? ' checked' : ''}><span class="theme-swatch" style="background:${t.swatch}"></span><span><b>${t.name}</b><small>${t.note}</small></span></label>`).join('');
+  $('partner-list').innerHTML = Object.entries(PARTNERS).map(([id, p]) => `<label class="partner">${spriteHtml(creatureGrid(id), 3)}${p.name}<input type="radio" name="partner" value="${id}" aria-label="${p.name}"${id === settings.partner ? ' checked' : ''}></label>`).join('');
+}
+function pickLook(e) {
+  if (e.target.name === 'theme') settings.theme = e.target.value;
+  else if (e.target.name === 'partner') settings.partner = e.target.value;
+  else return;
+  applyTheme();
+  saveSettings();
+  setStatus(`${e.target.name === 'theme' ? THEMES[settings.theme].name : PARTNERS[settings.partner].name} selected`);
+}
+$('theme-list').addEventListener('change', pickLook);
+$('partner-list').addEventListener('change', pickLook);
+
+/* ---------- Celebrations ---------- */
+
+const calmMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Counts on the home screen; while a claim is open the old figure waits, so it counts up on return.
+let shownGrand = 0, grandFrame = 0;
+function setGrand(value) {
+  if (view !== 'home' || calmMotion()) {
+    if (view === 'home') { shownGrand = value; $('grand').textContent = rupiah(value); }
+    return;
+  }
+  cancelAnimationFrame(grandFrame);
+  const from = shownGrand, start = performance.now();
+  const step = now => {
+    const t = Math.min(1, Math.max(0, now - start) / 700), n = from + (value - from) * (1 - (1 - t) ** 3);
+    shownGrand = t < 1 ? n : value;
+    $('grand').textContent = rupiah(shownGrand);
+    if (t < 1) grandFrame = requestAnimationFrame(step);
+  };
+  grandFrame = requestAnimationFrame(step);
+}
+
+// Shown only when the claim grew, so looking at an old claim and leaving stays quiet.
+function celebrateDone(ev) {
+  const added = eventTotal(ev) - openedTotal;
+  if (ev.example || added <= 0) return;
+  const sprite = themeSprite(), trip = document.createElement('div');
+  trip.className = 'trip';
+  trip.setAttribute('role', 'status');
+  trip.innerHTML = `<div class="trip-track"><span class="trip-car">${sprite ? spriteHtml(sprite, settings.theme === 'monster' ? 2 : 2.4) : ic('car')}</span><svg class="pin trip-pin"><use href="#i-pin"/></svg></div>
+    <b>${esc(rupiah(added))} claimed · ${esc(rupiah(eventBack(ev) - openedBack))} back</b>`;
+  document.body.append(trip);
+  setTimeout(() => trip.remove(), 2000);
+}
+
+function confetti() {
+  if (calmMotion()) return;
+  const colors = THEMES[settings.theme].confetti;
+  for (let i = 0; i < 30; i++) {
+    const bit = document.createElement('span');
+    bit.className = 'confetti';
+    bit.style.left = `${Math.random() * 100}%`;
+    bit.style.background = colors[i % colors.length];
+    bit.animate([
+      { transform: 'translateY(0) rotate(0)' },
+      { transform: `translate(${Math.random() * 80 - 40}px, ${window.innerHeight + 30}px) rotate(${Math.random() * 720 - 360}deg)` },
+    ], { duration: 900 + Math.random() * 700, delay: Math.random() * 200, easing: 'cubic-bezier(.3,.4,.6,1)', fill: 'both' }).onfinish = () => bit.remove();
+    document.body.append(bit);
+  }
+}
+
+/* ---------- Monthly recap: drawn on this device, and only when asked for ---------- */
+
+function monthStats(list) {
+  const legs = list.flatMap(e => e.legs), places = {};
+  for (const leg of legs) {
+    const to = (leg.to || '').trim();
+    if (to && !/^home$/i.test(to)) places[to] = (places[to] || 0) + 1;
+  }
+  return {
+    km: Math.round(legs.filter(isCar).reduce((a, l) => a + (parseFloat(String(l.km).replace(',', '.')) || 0), 0) * 10) / 10,
+    clients: new Set(list.map(e => (e.client || '').trim().toLowerCase()).filter(Boolean)).size,
+    routes: legs.length,
+    top: Object.entries(places).sort((a, b) => b[1] - a[1])[0]?.[0] || '',
+    claimed: list.reduce((a, e) => a + eventTotal(e), 0),
+  };
+}
+
+async function drawRecap(stats) {
+  const css = getComputedStyle(document.documentElement), v = name => css.getPropertyValue(name).trim(), family = v('--sans');
+  await Promise.race([
+    Promise.all(['500 40px', '700 90px'].map(w => document.fonts.load(`${w} ${family}`))).catch(() => {}),
+    new Promise(res => setTimeout(res, 1500)),
+  ]);
+  const c = document.createElement('canvas'), W = 1080, H = 1350, g = c.getContext('2d');
+  c.width = W;
+  c.height = H;
+  const text = (str, x, y, size, color, weight = 700, max = W - 2 * x) => {
+    let s = size;
+    g.fillStyle = color;
+    do { g.font = `${weight} ${s}px ${family}`; s -= 2; } while (g.measureText(str).width > max && s > 30);
+    let out = str;
+    while (g.measureText(out).width > max && out.length > 1) out = out.slice(0, -2) + '…';
+    g.fillText(out, x, y);
+  };
+  const tile = (x, y, w, h, label, value, size) => {
+    g.fillStyle = v('--surface');
+    g.beginPath();
+    g.roundRect(x, y, w, h, settings.theme === 'pixel' ? 0 : 28);
+    g.fill();
+    text(label, x + 36, y + 62, 34, v('--muted'), 500, w - 72);
+    text(value, x + 36, y + h - 44, size, v('--fg'), 700, w - 72);
+  };
+  g.fillStyle = v('--bg');
+  g.fillRect(0, 0, W, H);
+  g.fillStyle = v('--recap-hero');
+  g.fillRect(0, 0, W, 380);
+  const heroFg = v('--hero-fg');
+  text('Monthly recap', 64, 120, 44, heroFg, 500, 640);
+  text(monthLabel(), 64, 200, 68, heroFg, 700, 640);
+  text('Total claimed', 64, 286, 34, heroFg, 500, 640);
+  text(rupiah(stats.claimed), 64, 350, 58, heroFg, 700, 640);
+  const sprite = themeSprite();
+  if (sprite) drawSprite(g, sprite, W - 64 - sprite.rows[0].length * 11, 110, 11);
+  tile(64, 420, 462, 230, 'Distance', `${stats.km.toLocaleString('en-US')} km`, 76);
+  tile(554, 420, 462, 230, 'Clients', String(stats.clients), 76);
+  tile(64, 678, 952, 200, 'Most visited', stats.top || '-', 60);
+  tile(64, 906, 952, 230, 'Routes', String(stats.routes), 76);
+  text('Claim Transport', 64, 1250, 36, v('--bg') === '#5c94fc' ? '#ffffff' : v('--muted'), 700);
+  return new Promise(res => c.toBlob(res, 'image/png'));
+}
+
+let recapFile = null;
+async function openRecap() {
+  const list = inMonth().filter(e => !e.example);
+  if (!list.length) { setStatus('Add a claim this month first, then your recap will appear here.', true); return; }
+  setStatus('Making your recap…');
+  try {
+    const stats = monthStats(list), blob = await drawRecap(stats);
+    recapFile = new File([blob], `Claim Transport Recap - ${monthLabel()}.png`, { type: 'image/png' });
+    const img = $('recap-img');
+    URL.revokeObjectURL(img.src);
+    img.src = URL.createObjectURL(blob);
+    img.alt = `${monthLabel()}: ${stats.km} km, ${plural(stats.clients, 'client')}, ${plural(stats.routes, 'route')}, ${rupiah(stats.claimed)} claimed.`;
+    $('recap-share').textContent = navigator.canShare?.({ files: [recapFile] }) ? 'Share image' : 'Save image';
+    $('status').hidden = true;
+    $('recap-dialog').showModal();
+  } catch (e) {
+    setStatus('Could not make the recap. Try again.', true);
+  }
+}
+$('recap').addEventListener('click', openRecap);
+$('recap-close').addEventListener('click', () => $('recap-dialog').close());
+$('recap-share').addEventListener('click', async () => {
+  if (!navigator.canShare?.({ files: [recapFile] })) { saveFile(recapFile.name, recapFile); return; }
+  try { await navigator.share({ files: [recapFile], title: recapFile.name }); }
+  catch (e) { if (e.name !== 'AbortError') saveFile(recapFile.name, recapFile); }
+});
+
 async function boot() {
   const now = new Date();
   viewMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -1285,6 +1656,8 @@ async function boot() {
   }
   // Asks the browser not to clear this site's data on its own. It may say no, so nothing depends on the answer.
   navigator.storage?.persist?.().catch(() => {});
+  applyTheme();
+  renderThemeOptions();
   $('employee').value = settings.name;
   $('rate').value = settings.rate;
   $('summary').checked = settings.summary;
