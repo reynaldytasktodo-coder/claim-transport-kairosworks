@@ -119,7 +119,6 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .thumb span { position: absolute; left: 0; right: 0; bottom: 0; font-size: 11px; font-weight: 700; text-align: center; padding: 2px; color: var(--on-brand); background: var(--brand); }
 .add-proof { position: relative; cursor: pointer; width: fit-content; }
 .add-proof input { position: absolute; inset: 0; opacity: 0; width: 100%; min-height: 0; height: 100%; padding: 0; cursor: pointer; }
-.read-map { display: grid; gap: 6px; margin-bottom: 12px; }
 .add-routes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .add-routes .pill { background: var(--surface); box-shadow: var(--shadow); min-height: 48px; border-radius: 16px; }
 .save-state { font-size: 12px; opacity: .9; }
@@ -476,10 +475,6 @@ function legHtml(ev, leg, i) {
       <label class="f" data-kmwrap>Distance (km)<input id="l-km-${leg.id}" data-f="km" inputmode="decimal" value="${esc(leg.km)}"></label>
       <label class="f" data-farewrap>Invoice amount (Rp)<input id="l-fare-${leg.id}" data-f="fare" value="${esc(leg.fare)}"></label>
     </div>
-    <div class="read-map" data-readwrap>
-      <label class="pill add-proof">${ic('image')}Read from screenshot<input id="l-read-${leg.id}" type="file" accept="image/*" data-read aria-label="Choose a Google Maps screenshot to read"></label>
-      <p class="note">Fills in the destination, distance and toll from a Google Maps screenshot, and adds it as proof. Reading another screenshot replaces them. Pick your route in Maps first.</p>
-    </div>
     <div class="fare-line" data-carline><span data-faretext></span><b data-fare></b></div>
     ${leg.rows.map(rowHtml).join('')}
     <div class="adders">
@@ -572,7 +567,6 @@ function recalc() {
       legEl.querySelector('[data-kmwrap]').hidden = !car;
       legEl.querySelector('[data-farewrap]').hidden = car;
       legEl.querySelector('[data-carline]').hidden = !car;
-      legEl.querySelector('[data-readwrap]').hidden = !car;
       legEl.querySelector('[data-faretext]').textContent = `${leg.km || 0} km × ${rupiah(ev.rate)}`;
       legEl.querySelector('[data-fare]').textContent = rupiah(legFare(ev, leg));
       legEl.querySelector('[data-f="fare"]').classList.toggle('bad', parseParts(leg.fare, ev.rate) === null);
@@ -702,7 +696,6 @@ $('list').addEventListener('change', e => {
     render();
   }
   if (t.dataset.file !== undefined && ev) { addImages(ev, findLeg(ev, t), t.files); t.value = ''; }
-  if (t.dataset.read !== undefined && ev) { readScreenshot(ev, findLeg(ev, t), t.files[0]); t.value = ''; }
 });
 
 $('list').addEventListener('click', async e => {
@@ -796,126 +789,6 @@ async function addImages(ev, leg, files) {
   if (saveFailed) setStatus(saveError(saveFailed), true);
   else if (unreadable) setStatus(`${plural(unreadable, 'image')} could not be read. Convert iPhone HEIC photos to JPG or PNG first.`, true);
   else setStatus('Proof saved');
-  return !saveFailed && !unreadable;
-}
-
-/* ---------- Reading Google Maps screenshots: the text is read on this device ---------- */
-
-// Finds the distance and toll in a directions screenshot, as "25 km · IDR 19,500". Maps only prices the toll on some routes.
-function parseMapsText(text) {
-  const lines = String(text).split('\n');
-  const found = lines.map(l => l.match(/(\d+(?:[.,]\d+)?)\s*km\b/i));
-  const at = found.findIndex(Boolean);
-  if (at < 0) return null;
-  const km = found[at][1].replace(',', '.');
-  const money = `${lines[at]} ${lines[at + 1] || ''}`.match(/(?:[I1l|]DR|Rp\.?)\s*(\d{1,3}(?:[.,]\d{3})+|\d{4,})/i);
-  const others = found.filter(m => m && m[1].replace(',', '.') !== km);
-  return { km, toll: money ? money[1].replace(/[.,]/g, '') : '', several: others.length > 0 };
-}
-
-// The destination is the last line of the search box at the top of the screen.
-function parseMapsPlace(text) {
-  const lines = String(text).split('\n').map(l => l.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N})]+$/gu, '')).filter(l => (l.match(/\p{L}/gu) || []).length >= 3);
-  const place = lines[lines.length - 1] || '';
-  return /your location/i.test(place) ? '' : place;
-}
-
-// Maps prints the route at the bottom of the screen and the stops in a box at the top, leaving out the box's icons.
-const MAPS_ROUTE = { x: 0, y: 0.6, w: 1, h: 0.4 }, MAPS_STOPS = { x: 0.145, y: 0.07, w: 0.72, h: 0.105 };
-
-// Returns that part of the screen as dark text on a light background.
-async function mapsPanel(file, width, box) {
-  const url = URL.createObjectURL(file);
-  try {
-    const img = await loadImage(url);
-    const sx = img.naturalWidth * box.x, sy = img.naturalHeight * box.y, sw = img.naturalWidth * box.w, sh = img.naturalHeight * box.h;
-    const scale = width / sw;
-    const c = document.createElement('canvas');
-    c.width = width;
-    c.height = Math.round(sh * scale);
-    const g = c.getContext('2d');
-    g.drawImage(img, sx, sy, sw, sh, 0, 0, c.width, c.height);
-    const shot = g.getImageData(0, 0, c.width, c.height), px = shot.data;
-    let total = 0;
-    for (let i = 0; i < px.length; i += 4) total += (px[i] + px[i + 1] + px[i + 2]) / 3;
-    const dark = total / (px.length / 4) < 128;
-    for (let i = 0; i < px.length; i += 4) {
-      const v = (px[i] + px[i + 1] + px[i + 2]) / 3;
-      px[i] = px[i + 1] = px[i + 2] = dark ? 255 - v : v;
-    }
-    g.putImageData(shot, 0, 0);
-    return c;
-  } finally { URL.revokeObjectURL(url); }
-}
-
-function loadScript(src) {
-  return new Promise((res, rej) => {
-    const s = document.createElement('script');
-    s.src = src;
-    s.onload = res;
-    s.onerror = () => rej(new Error('script'));
-    document.head.append(s);
-  });
-}
-
-// Reads the screen at two sizes. A misread digit rarely repeats, so a disagreement means the figures need checking.
-async function readMapsScreen(file) {
-  const [large, small, stopsLarge, stopsSmall] = await Promise.all([
-    mapsPanel(file, 2000, MAPS_ROUTE), mapsPanel(file, 1200, MAPS_ROUTE), mapsPanel(file, 1500, MAPS_STOPS), mapsPanel(file, 900, MAPS_STOPS),
-  ]);
-  if (!window.Tesseract) await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
-  const worker = await Tesseract.createWorker('eng');
-  try {
-    const first = parseMapsText((await worker.recognize(large)).data.text);
-    const second = parseMapsText((await worker.recognize(small)).data.text);
-    const got = first || second;
-    if (!got) return null;
-    const placeA = parseMapsPlace((await worker.recognize(stopsLarge)).data.text);
-    const placeB = parseMapsPlace((await worker.recognize(stopsSmall)).data.text);
-    return { ...got, to: placeA || placeB, unsure: got.several || !first || !second || first.km !== second.km || first.toll !== second.toll || placeA !== placeB };
-  } finally { worker.terminate(); }
-}
-
-// The form always follows the latest screenshot. One picked during a reading waits, then replaces it.
-let reading = false, nextRead = null;
-async function readScreenshot(ev, leg, file) {
-  if (!file) return;
-  if (ev.example) { clearExample(); setStatus('Tap + first, then read screenshots on your own claim.', true); show('home'); return; }
-  if (reading) { nextRead = [ev, leg, file]; return; }
-  reading = true;
-  setStatus('Reading the screenshot…');
-  try {
-    let got;
-    try { got = await readMapsScreen(file); }
-    catch (e) { setStatus('Could not read that screenshot. Check your internet connection, or type the distance and toll.', true); return; }
-    if (!got) { setStatus('No distance found. Use a Google Maps directions screenshot, or type the distance and toll.', true); return; }
-    leg.to = got.to;
-    leg.km = got.km;
-    leg.rows = leg.rows.filter(r => r.type !== 'toll');
-    leg.rows.unshift({ ...newRow('toll', 'Toll'), val: got.toll });
-    const count = leg.images.length;
-    if (!await addImages(ev, leg, [file])) return;
-    replaceMapImage(ev, leg, leg.images[count]);
-    const parts = [got.to, `${got.km} km`, got.toll ? `${rupiah(+got.toll)} toll` : 'no toll'].filter(Boolean).join(', ');
-    const missing = got.to ? '' : ' Type the destination, it could not be read.';
-    setStatus(got.unsure ? `Filled in ${parts}.${missing} The screenshot was hard to read, so compare these figures with it.` : `Filled in ${parts}.${missing || ' Please check.'}`, got.unsure || !got.to);
-  } finally {
-    reading = false;
-    if (nextRead) { const args = nextRead; nextRead = null; readScreenshot(...args); }
-  }
-}
-
-// The new screenshot takes the place of the one read before it, so the proof matches the figures.
-function replaceMapImage(ev, leg, id) {
-  const at = leg.images.indexOf(leg.mapImage);
-  if (at >= 0) {
-    dropImages(ev, [leg.mapImage]);
-    leg.images = leg.images.filter(i => i !== id);
-    leg.images[at] = id;
-  }
-  leg.mapImage = id;
-  render();
-  queueSave(ev);
 }
 
 let activeProof = null;
