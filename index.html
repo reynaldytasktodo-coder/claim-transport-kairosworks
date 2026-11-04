@@ -674,9 +674,11 @@ $('list').addEventListener('input', e => {
   if (t.dataset.pick) {
     const target = t.dataset.pick === 'kind' ? ev : findLeg(ev, t), custom = t.value === OTHER, id = t.id;
     target[t.dataset.pick] = custom ? '' : t.value;
-    render();
     queueSave(ev);
-    $(custom ? `${id}-text` : id).focus();
+    // Rebuilding the page while a dropdown is open can close it on iPhone, so only the free-text box does that.
+    if (custom) { render(); $(`${id}-text`).focus(); return; }
+    $(`${id}-text`)?.remove();
+    recalc();
     return;
   }
   if (t.dataset.e) ev[t.dataset.e] = t.value;
@@ -854,8 +856,9 @@ $('routes-list').addEventListener('input', e => {
     const custom = t.value === OTHER, id = t.id;
     route.mode = custom ? '' : t.value;
     saveSettings();
-    render();
-    $(custom ? `${id}-text` : id).focus();
+    if (custom) { render(); $(`${id}-text`).focus(); return; }
+    $(`${id}-text`)?.remove();
+    card.querySelector('[data-kmwrap]').hidden = !isCar(route);
     return;
   }
   if (!t.dataset.r) return;
