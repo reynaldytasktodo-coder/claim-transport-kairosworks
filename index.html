@@ -478,7 +478,7 @@ function legHtml(ev, leg, i) {
     </div>
     <div class="read-map" data-readwrap>
       <label class="pill add-proof">${ic('image')}Read from screenshot<input id="l-read-${leg.id}" type="file" accept="image/*" data-read aria-label="Choose a Google Maps screenshot to read"></label>
-      <p class="note">Fills in the destination, distance and toll from a Google Maps screenshot, and adds it as proof. A destination you already typed stays. Pick your route in Maps first.</p>
+      <p class="note">Fills in the destination, distance and toll from a Google Maps screenshot, and adds it as proof. Reading another screenshot replaces them. Pick your route in Maps first.</p>
     </div>
     <div class="fare-line" data-carline><span data-faretext></span><b data-fare></b></div>
     ${leg.rows.map(rowHtml).join('')}
@@ -870,18 +870,18 @@ async function readMapsScreen(file) {
     const second = parseMapsText((await worker.recognize(small)).data.text);
     const got = first || second;
     if (!got) return null;
-    const place = parseMapsPlace((await worker.recognize(stopsLarge)).data.text);
-    // A wrong place name is worse than an empty field, so the two readings must agree.
-    const to = place && place === parseMapsPlace((await worker.recognize(stopsSmall)).data.text) ? place : '';
-    return { ...got, to, unsure: got.several || !first || !second || first.km !== second.km || first.toll !== second.toll };
+    const placeA = parseMapsPlace((await worker.recognize(stopsLarge)).data.text);
+    const placeB = parseMapsPlace((await worker.recognize(stopsSmall)).data.text);
+    return { ...got, to: placeA || placeB, unsure: got.several || !first || !second || first.km !== second.km || first.toll !== second.toll || placeA !== placeB };
   } finally { worker.terminate(); }
 }
 
-let reading = false;
+// The form always follows the latest screenshot. One picked during a reading waits, then replaces it.
+let reading = false, nextRead = null;
 async function readScreenshot(ev, leg, file) {
   if (!file) return;
   if (ev.example) { clearExample(); setStatus('Tap + first, then read screenshots on your own claim.', true); show('home'); return; }
-  if (reading) { setStatus('Still reading the last screenshot. Try again in a moment.', true); return; }
+  if (reading) { nextRead = [ev, leg, file]; return; }
   reading = true;
   setStatus('Reading the screenshot…');
   try {
@@ -889,18 +889,33 @@ async function readScreenshot(ev, leg, file) {
     try { got = await readMapsScreen(file); }
     catch (e) { setStatus('Could not read that screenshot. Check your internet connection, or type the distance and toll.', true); return; }
     if (!got) { setStatus('No distance found. Use a Google Maps directions screenshot, or type the distance and toll.', true); return; }
-    const placed = got.to && !leg.to.trim() ? got.to : '';
-    if (placed) leg.to = placed;
+    leg.to = got.to;
     leg.km = got.km;
-    if (got.toll) {
-      leg.rows = leg.rows.filter(r => r.type !== 'toll');
-      leg.rows.unshift({ ...newRow('toll', 'Toll'), val: got.toll });
-    }
+    leg.rows = leg.rows.filter(r => r.type !== 'toll');
+    leg.rows.unshift({ ...newRow('toll', 'Toll'), val: got.toll });
+    const count = leg.images.length;
     if (!await addImages(ev, leg, [file])) return;
-    const where = placed ? `${placed}, ` : '';
-    const filled = got.toll ? `Filled in ${where}${got.km} km and ${rupiah(+got.toll)} toll` : `Filled in ${where}${got.km} km. No toll amount shown, so Toll stays as it was`;
-    setStatus(got.unsure ? `${filled}. The screenshot was hard to read, so compare these figures with it.` : `${filled}. Please check.`, got.unsure);
-  } finally { reading = false; }
+    replaceMapImage(ev, leg, leg.images[count]);
+    const parts = [got.to, `${got.km} km`, got.toll ? `${rupiah(+got.toll)} toll` : 'no toll'].filter(Boolean).join(', ');
+    const missing = got.to ? '' : ' Type the destination, it could not be read.';
+    setStatus(got.unsure ? `Filled in ${parts}.${missing} The screenshot was hard to read, so compare these figures with it.` : `Filled in ${parts}.${missing || ' Please check.'}`, got.unsure || !got.to);
+  } finally {
+    reading = false;
+    if (nextRead) { const args = nextRead; nextRead = null; readScreenshot(...args); }
+  }
+}
+
+// The new screenshot takes the place of the one read before it, so the proof matches the figures.
+function replaceMapImage(ev, leg, id) {
+  const at = leg.images.indexOf(leg.mapImage);
+  if (at >= 0) {
+    dropImages(ev, [leg.mapImage]);
+    leg.images = leg.images.filter(i => i !== id);
+    leg.images[at] = id;
+  }
+  leg.mapImage = id;
+  render();
+  queueSave(ev);
 }
 
 let activeProof = null;
