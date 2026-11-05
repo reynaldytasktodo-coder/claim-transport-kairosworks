@@ -163,7 +163,7 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .hero > * { position: relative; }
 .hero > .mascot { position: absolute; }
 .sprite { display: block; shape-rendering: crispEdges; }
-[data-theme="playful"] #grand-note, [data-theme="pixel"] #grand-note, [data-theme="monster"] #grand-note { padding-right: 92px; }
+[data-theme="playful"] #grand-note, [data-theme="pixel"] #grand-note { padding-right: 92px; }
 .trip { position: fixed; z-index: 7; top: calc(78px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); width: min(calc(100% - 32px), 480px); pointer-events: none; display: grid; gap: 6px; background: var(--surface); color: var(--fg); border-radius: 16px; padding: 10px 14px; box-shadow: 0 10px 28px rgba(0, 0, 0, .28); font-size: 14px; text-align: center; animation: trip-fade 2s both; }
 .trip b { font-weight: 800; }
 .trip-track { position: relative; height: 34px; border-bottom: 3px dashed var(--brand); }
@@ -224,7 +224,7 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 [data-theme="playful"] select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236d35e8' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); }
 
 /* Pixel Adventure. VT323 because its 2, 5, 6 and 8 stay easy to tell apart, which matters on an app about money. */
-[data-theme="pixel"] body, [data-theme="monster"] body, [data-theme="pixel"] input, [data-theme="pixel"] select, [data-theme="monster"] input, [data-theme="monster"] select { font-size-adjust: .6; }
+[data-theme="pixel"] body, [data-theme="pixel"] input, [data-theme="pixel"] select { font-size-adjust: .6; }
 :root[data-theme="pixel"] {
   --bg: #5c94fc; --surface: #fff7d6; --field: #fdebb0; --fg: #1c1208; --muted: #57452a; --line: #d9c48a;
   --brand: #b83a08; --brand-deep: #8e2a06; --on-brand: #ffffff; --tint: #ffd98a; --warn: #4f3300; --warn-bg: #ffe07a; --danger: #a31c14;
@@ -245,27 +245,95 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 [data-theme="pixel"] .fab { background: #f8b800; color: #1c1208; border: 4px solid #1c1208; box-shadow: 4px 4px 0 rgba(0, 0, 0, .4); }
 [data-theme="pixel"] button:active, [data-theme="pixel"] .pill:active { transform: translate(2px, 2px); }
 [data-theme="pixel"] .mascot { display: block; animation: hop 1s steps(4) infinite; }
-[data-theme="pixel"] .trip, [data-theme="monster"] .trip { border: 3px solid #1c1208; }
+[data-theme="pixel"] .trip { border: 3px solid #1c1208; }
 [data-theme="pixel"] .enter .hero, [data-theme="pixel"] .enter .lift { animation: enter-step .32s steps(4) both; }
 [data-theme="pixel"] select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' shape-rendering='crispEdges' viewBox='0 0 16 16'%3E%3Cpath d='M3 5h10v2h-2v2H9v2H7V9H5V7H3z' fill='%231c1208'/%3E%3C/svg%3E"); }
 
-/* Monster Partner. The partner choice sets the colours. */
+/* Monster Partner. A glossy mobile game: framed panels under a striped title bar, gold titles, blue buttons, a smooth cartoon partner. The partner choice sets the bar and accent colours. */
 :root[data-theme="monster"] {
-  --bg: #e4f1cf; --surface: #fbfbf2; --field: #eeecdf; --fg: #24242f; --muted: #55555f; --line: #d8d6c6;
-  --warn: #5e4200; --warn-bg: #fbe7a0; --shadow: 0 3px 0 rgba(0, 0, 0, .22); --sans: "VT323", ui-monospace, Menlo, monospace;
-  --brand: #c23f0c; --brand-deep: #93300a; --tint: #ffe3d1; --on-brand: #ffffff; --recap-hero: var(--brand); --proof-line: #3a3a4a;
+  --bg: #86cc68; --surface: #fffdf3; --field: #fff5d2; --fg: #4a2a10; --muted: #6f4f2c; --line: #f0dcae;
+  --warn: #6e3f00; --warn-bg: #ffe9a6; --danger: #c4261c;
+  --shadow: 0 4px 0 rgba(110, 62, 8, .3), 0 8px 16px rgba(50, 35, 10, .18);
+  --sans: "Nunito", -apple-system, "Segoe UI", Roboto, sans-serif; --title: "Baloo 2", "Nunito", -apple-system, sans-serif;
+  --brand: #c8510c; --brand-deep: #96390a; --tint: #ffeeb8; --on-brand: #ffffff; --recap-hero: var(--brand); --proof-line: #d9a53f;
+  --frame: #b8660d; --stripe-a: #f7a823; --stripe-b: #ffc64a; --outline: #713607; --roster-a: #fff3b8; --roster-b: #ffdd6a; --roster-line: #c98a1c;
+  --gloss: linear-gradient(#4aa8ef, #1a78d2 50%, #0f66c0); --gloss-line: #0b4a96;
+  --gloss-shadow: inset 0 2px 0 rgba(255, 255, 255, .6), inset 0 -2px 0 rgba(0, 35, 100, .3), 0 3px 0 rgba(11, 60, 130, .45);
+  --hero-fg: #ffffff; --hero-bg: repeating-linear-gradient(-45deg, var(--stripe-a) 0 16px, var(--stripe-b) 16px 32px);
 }
-:root[data-theme="monster"][data-partner="leaf"] { --brand: #277a42; --brand-deep: #1c5e32; --tint: #d6f2dc; }
-:root[data-theme="monster"][data-partner="wave"] { --brand: #1d6fd6; --brand-deep: #114e9f; --tint: #d8e9ff; }
-[data-theme="monster"] body { background-image: conic-gradient(#d8e9bd 25%, transparent 0 50%, #d8e9bd 0 75%, transparent 0); background-size: 32px 32px; }
-[data-theme="monster"] .hero h1 { font-size: 25px; font-weight: 700; }
-[data-theme="monster"] .grand b { font-size: 37px; }
-[data-theme="monster"] .card, [data-theme="monster"] .claim, [data-theme="monster"] .add-routes .pill, [data-theme="monster"] .recap { border: 3px solid #3a3a4a; border-radius: 10px; box-shadow: inset 0 0 0 2px var(--tint), var(--shadow); }
-[data-theme="monster"] .cta { border: 3px solid #3a3a4a; border-radius: 10px; }
-[data-theme="monster"] .fab { border-color: #3a3a4a; }
-[data-theme="monster"] .mascot { display: block; animation: hop 1.2s steps(4) infinite; }
-[data-theme="monster"] .mascot::after { content: ""; display: block; width: 64px; height: 10px; margin: 0 auto; border-radius: 50%; background: rgba(0, 0, 0, .28); }
-[data-theme="monster"] .enter .hero, [data-theme="monster"] .enter .lift { animation: enter-step .32s steps(4) both; }
+:root[data-theme="monster"][data-partner="leaf"] { --brand: #277a42; --brand-deep: #1c5e32; --frame: #2f7d3f; --stripe-a: #6cbf4a; --stripe-b: #97d868; --outline: #1d4f22; }
+:root[data-theme="monster"][data-partner="wave"] { --brand: #1d6fd6; --brand-deep: #114e9f; --frame: #2670c4; --stripe-a: #4aa6ee; --stripe-b: #7cc4f7; --outline: #123f7a; }
+
+/* The blurred landscape behind every panel */
+[data-theme="monster"] body::before { content: ""; position: fixed; inset: -40px; z-index: -1; filter: blur(14px);
+  background: radial-gradient(ellipse 34% 7% at 74% 72%, #c9cf86 99%, transparent), radial-gradient(ellipse 26% 5% at 16% 90%, #c2cb80 99%, transparent), radial-gradient(ellipse 50% 13% at 6% 46%, #6dba5a 99%, transparent), radial-gradient(ellipse 60% 16% at 96% 34%, #76c060 99%, transparent), linear-gradient(#63c6ea 0 16%, #86cc68 16%); }
+
+/* Title bar and gold lettering */
+[data-theme="monster"] .hero { border-radius: 0 0 24px 24px; border-bottom: 4px solid var(--frame); box-shadow: inset 0 -3px 0 rgba(255, 255, 255, .55), 0 4px 0 rgba(90, 50, 5, .25); padding-bottom: 46px; }
+[data-theme="monster"] .hero h1, [data-theme="monster"] .section-title h2 { width: fit-content; font-family: var(--title); font-weight: 800; line-height: 1.2; padding-top: 2px; color: transparent; background: linear-gradient(#fff6b0 15%, #ffd23c 55%, #f5a31a); -webkit-background-clip: text; background-clip: text;
+  filter: drop-shadow(0 2px 0 var(--outline)) drop-shadow(2px 0 0 var(--outline)) drop-shadow(-2px 0 0 var(--outline)) drop-shadow(0 -2px 0 var(--outline)) drop-shadow(0 2px 0 rgba(60, 25, 0, .4)); }
+[data-theme="monster"] .hero h1 { font-size: 28px; }
+[data-theme="monster"] .section-title h2 { font-size: 23px; }
+[data-theme="monster"] .hero small, [data-theme="monster"] .hero .save-state, [data-theme="monster"] .section-title span { color: #ffffff; opacity: 1; font-weight: 800; text-shadow: 0 1px 0 var(--outline), 1px 0 0 var(--outline), -1px 0 0 var(--outline), 0 -1px 0 var(--outline), 0 2px 0 var(--outline); }
+[data-theme="monster"] .card h2, [data-theme="monster"] .leg-head h3, [data-theme="monster"] .proof h4, [data-theme="monster"] .month b { font-family: var(--title); font-weight: 700; color: var(--brand-deep); }
+[data-theme="monster"] .card h2 { font-size: 18px !important; }
+[data-theme="monster"] .month b { font-size: 18px; }
+
+/* The amount sits on a cream plate, with the partner on a stage beside it */
+[data-theme="monster"] .grand { background: var(--surface); color: var(--fg); border: 3px solid var(--frame); border-radius: 16px; box-shadow: inset 0 0 0 2px #fff, 0 3px 0 rgba(90, 50, 5, .3); padding: 10px 112px 10px 14px; min-height: 104px; align-content: center; }
+[data-theme="monster"] .grand span { opacity: 1; color: var(--muted); font-weight: 700; }
+[data-theme="monster"] .grand b { font-family: var(--title); font-size: 31px; line-height: 1.1; color: var(--brand-deep); }
+[data-theme="monster"] .hero > .mascot { display: grid; place-items: center; width: 92px; height: 92px; right: calc(max(16px, env(safe-area-inset-right, 0px)) + 8px); bottom: 53px; border-radius: 50%; background: radial-gradient(circle, #fff 0 38%, var(--tint) 39% 50%, #fff 51% 59%, var(--tint) 60%); }
+.creature { display: block; }
+[data-theme="monster"] .mascot .creature { transform-origin: 50% 100%; animation: idle 2.4s ease-in-out infinite; }
+@keyframes idle { 50% { transform: translateY(-2px) scale(1.03, .98); } }
+
+/* Panels */
+[data-theme="monster"] .card, [data-theme="monster"] .recap { border: 3px solid var(--frame); border-radius: 18px; box-shadow: inset 0 0 0 2px #fff, var(--shadow); }
+[data-theme="monster"] .month { border-radius: 18px; }
+[data-theme="monster"] .claim, [data-theme="monster"] .total, [data-theme="monster"] .partner:has(input:checked) { background: linear-gradient(var(--roster-a), var(--roster-b)); border: 3px solid var(--roster-line); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .7), var(--shadow); }
+[data-theme="monster"] .claim { border-radius: 16px; }
+[data-theme="monster"] .claim-main .kind { color: var(--brand-deep); font-weight: 800; }
+[data-theme="monster"] .claim-amt { font-family: var(--title); font-size: 16px; font-weight: 800; }
+[data-theme="monster"] .claim-amt small { font-family: var(--sans); color: var(--fg); font-weight: 700; }
+[data-theme="monster"] .claim-main small { color: var(--fg); }
+[data-theme="monster"] .date-tile { background: linear-gradient(#fff, #d6ecfb); color: var(--brand-deep); border: 3px solid #fff; border-radius: 12px; box-shadow: 0 0 0 2px var(--roster-line); margin: 2px; height: 58px; }
+[data-theme="monster"] .date-tile b { font-family: var(--title); font-size: 24px; line-height: 1; }
+[data-theme="monster"] .chip { background: #d8342a; color: #fff; font-weight: 800; box-shadow: 0 1px 0 #8e1a12; }
+[data-theme="monster"] .total { box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .7); }
+[data-theme="monster"] .total b { font-family: var(--title); font-size: 19px; }
+[data-theme="monster"] input:not([type="radio"]):not([type="checkbox"]):not([type="file"]), [data-theme="monster"] select { border: 2px solid #ebd294; }
+[data-theme="monster"] input:not([type="radio"]):not([type="checkbox"]):not([type="file"]):focus, [data-theme="monster"] select:focus { border-color: var(--brand); }
+[data-theme="monster"] input.bad { border-color: var(--danger) !important; }
+[data-theme="monster"] .fare-line { border: 2px solid #ebd294; }
+[data-theme="monster"] .leg-head .tag { background: var(--brand); color: #fff; }
+[data-theme="monster"] .promo { border: 3px solid var(--outline); box-shadow: var(--shadow); }
+[data-theme="monster"] .notice { border: 3px solid var(--roster-line); box-shadow: var(--shadow); }
+[data-theme="monster"] .empty .tile { background: linear-gradient(#fff, #d6ecfb); box-shadow: 0 0 0 2px var(--roster-line); }
+[data-theme="monster"] .trip { border: 3px solid var(--frame); box-shadow: inset 0 0 0 2px #fff, 0 10px 28px rgba(0, 0, 0, .28); }
+[data-theme="monster"] .partner { background: var(--field); border: 3px solid transparent; border-radius: 14px; padding: 8px 4px; }
+
+/* Glossy blue buttons */
+[data-theme="monster"] .cta, [data-theme="monster"] .outline, [data-theme="monster"] .pill, [data-theme="monster"] .add-routes .pill, [data-theme="monster"] .round, [data-theme="monster"] .month button, [data-theme="monster"] .fab { background: var(--gloss); color: #fff; border: 2.5px solid var(--gloss-line); box-shadow: var(--gloss-shadow); font-family: var(--title); font-weight: 700; text-shadow: 0 1.5px 0 rgba(5, 45, 110, .85); }
+[data-theme="monster"] .cta { border-radius: 18px; font-size: 18px; }
+[data-theme="monster"] .outline { border-radius: 16px; font-size: 16px; }
+[data-theme="monster"] .pill, [data-theme="monster"] .add-routes .pill { font-size: 15px; }
+[data-theme="monster"] .add-routes .pill { border-radius: 18px; }
+[data-theme="monster"] .round.armed { background: #fff; color: var(--danger); text-shadow: none; border-color: var(--danger); }
+[data-theme="monster"] .round { border: 3px solid #fff; box-shadow: 0 0 0 2px var(--gloss-line), inset 0 2px 0 rgba(255, 255, 255, .5), 0 4px 0 rgba(60, 35, 5, .35); }
+[data-theme="monster"] .ic { stroke-width: 2.6; }
+[data-theme="monster"] .fab { border: 4px solid #fff; box-shadow: 0 0 0 2.5px var(--gloss-line), inset 0 3px 0 rgba(255, 255, 255, .5), 0 5px 0 rgba(11, 60, 130, .4); }
+[data-theme="monster"] button:active, [data-theme="monster"] .pill:active, [data-theme="monster"] .outline:active { transform: translateY(2px); }
+
+/* Bottom bar */
+[data-theme="monster"] .nav, [data-theme="monster"] .donebar { border-top: 4px solid var(--frame); box-shadow: inset 0 2px 0 #fff, 0 -3px 12px rgba(50, 35, 10, .25); }
+[data-theme="monster"] .tab { font-weight: 800; }
+[data-theme="monster"] .tab.on { color: var(--brand-deep); }
+[data-theme="monster"] .tab.on i { background: var(--gloss); border: 2px solid var(--gloss-line); box-shadow: inset 0 2px 0 rgba(255, 255, 255, .55); color: #fff; }
+[data-theme="monster"] .donebar b { font-family: var(--title); font-size: 21px; }
+[data-theme="monster"] .enter .hero { animation: enter-fade .25s ease-out both; }
+[data-theme="monster"] .enter .lift { animation: enter-pop .35s cubic-bezier(.3, 1.4, .5, 1) both; }
+[data-theme="monster"] select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%231a78d2' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); }
 
 @keyframes enter-fade { from { opacity: 0; } }
 @keyframes enter-pop { from { opacity: 0; transform: translateY(14px) scale(.97); } }
@@ -274,7 +342,7 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 @keyframes hop { 50% { transform: translateY(-6px); } }
 @keyframes clouds { to { background-position-x: 360px; } }
 @media (prefers-reduced-motion: reduce) {
-  .mascot, .trip-car, .enter .hero, .enter .lift, [data-theme="pixel"] body::before { animation: none !important; }
+  .mascot, .creature, .trip-car, .enter .hero, .enter .lift, [data-theme="pixel"] body::before { animation: none !important; }
   .trip-car { left: calc(100% - 58px); }
 }
 </style>
@@ -1430,34 +1498,69 @@ $('restore-file').addEventListener('change', e => {
 });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushSaves(); });
 
-/* ---------- Themes and pixel sprites ---------- */
+/* ---------- Themes and mascots ---------- */
 
 const THEMES = {
   kairos: { name: 'Kairos', note: 'Company colors', swatch: '#cb3a3a', color: '#cb3a3a', confetti: ['#cb3a3a', '#a92b2c', '#f6c945', '#fbe6e4'] },
   future: { name: 'Neon Future', note: 'Dark, modern and glowing', swatch: 'linear-gradient(135deg,#3b1fa8,#22d3ee)', color: '#3b1fa8', fonts: 'Space+Grotesk:wght@500;600;700', confetti: ['#22d3ee', '#a78bfa', '#7dedfc', '#f0abfc'] },
   playful: { name: 'Playful', note: 'Bright and bouncy, like a game', swatch: 'linear-gradient(135deg,#6d35e8,#ffc83d)', color: '#6d35e8', fonts: 'Fredoka:wght@500;600;700', confetti: ['#6d35e8', '#ffc83d', '#ff7ab8', '#37c8a0'] },
   pixel: { name: 'Pixel Adventure', note: 'Retro platform game, with bricks and coins', swatch: 'linear-gradient(#5c94fc 60%,#b5410f 60%)', color: '#b5410f', fonts: 'VT323&family=Press+Start+2P', confetti: ['#f8b800', '#ffd84d', '#c98a00'] },
-  monster: { name: 'Monster Partner', note: 'Retro monster game, with a partner you choose', swatch: 'linear-gradient(135deg,#277a42,#c23f0c 50%,#1d6fd6)', color: null, fonts: 'VT323', confetti: ['#f8d030', '#f85888', '#78c850', '#6890f0'] },
+  monster: { name: 'Monster Partner', note: 'Mobile monster game, with a partner you choose', swatch: 'repeating-linear-gradient(-45deg,#f7a823 0 7px,#ffc64a 7px 14px)', color: null, fonts: 'Nunito:wght@500;600;700;800&family=Baloo+2:wght@600;700;800', confetti: ['#ffd23c', '#f7a823', '#1a78d2', '#ff6b4a', '#6cbf4a'] },
 };
 
-// Original creatures made for this app. Each one is drawn on a shared body with its own features on top.
-const CREATURE_BODY = ['.....kkkkkk.....', '...kkBBBBBBkk...', '..kBBBBBBBBBBk..', '.kBBBBBBBBBBBBk.', '.kBBwkBBBBwkBBk.', 'kBBBwkBBBBwkBBBk', 'kBBBBBBBBBBBBBBk', 'kBBBBBkkkkBBBBBk', 'kBBBBBBBBBBBBBBk', '.kBBLLLLLLLLBBk.', '.kBLLLLLLLLLLBk.', '..kLLLLLLLLLLk..', '..kkBkkkkkkBkk..', '..kBBk....kBBk..', '..kkkk....kkkk..'];
+// Original creatures made for this app, drawn with flat cartoon shading on a 120 by 120 canvas.
+const eyes = (y, iris, line) => [46, 74].map(x => `<ellipse cx="${x}" cy="${y}" rx="7.5" ry="9.5" fill="${line}"/><ellipse cx="${x}" cy="${y + 2.5}" rx="5" ry="6" fill="${iris}"/><circle cx="${x - 2}" cy="${y - 4}" r="3" fill="#fff"/><circle cx="${x + 2.5}" cy="${y + 4.5}" r="1.4" fill="#fff"/>`).join('');
+const blush = (y, color) => [32, 88].map(x => `<ellipse cx="${x}" cy="${y}" rx="5.5" ry="3.5" fill="${color}"/>`).join('');
 const PARTNERS = {
-  leaf: { name: 'Sprigling', color: '#277a42', palette: { k: '#17331f', B: '#6cc07a', L: '#d8f0c0', w: '#ffffff', G: '#2f9e44', D: '#1c6e30' },
-    parts: [[8, 0, '..kkk.......kkk..'], [6, 1, '.kGGGk..kGGGk'], [6, 2, 'kGDGGGkkGGGDGk'], [7, 3, 'kkGGGkkGGGkk'], [9, 4, 'kkkkkkkk']] },
-  flame: { name: 'Emberpup', color: '#c23f0c', palette: { k: '#3a1606', B: '#f28a30', L: '#ffe2b8', w: '#ffffff', R: '#e8340c', Y: '#ffd23c' },
-    parts: [[3, 2, 'kk..........kk'], [3, 3, 'kBBk........kBBk'.slice(0, 16)], [3, 4, 'kBBBk......kBBBk'], [18, 5, '.k'], [17, 6, 'kRk'], [17, 7, 'kRYk'], [17, 8, 'kRYRk'.slice(0, 3)], [17, 9, 'kRk'], [17, 10, 'kBk'], [17, 11, 'kBk']] },
-  wave: { name: 'Ripplet', color: '#1d6fd6', palette: { k: '#0c2a55', B: '#58a8f0', L: '#e2f2ff', w: '#ffffff', C: '#a8ddff', S: '#2d7fd8' },
-    parts: [[9, 1, 'kk'], [8, 2, 'kCCk'], [8, 3, 'kSCk'], [8, 4, 'kkkk'], [0, 9, '.kk'], [0, 10, 'kSSk'], [0, 11, '.kSk'], [16, 9, 'kk.'], [16, 10, 'kSSk'], [16, 11, 'kSk']] },
+  leaf: { name: 'Sprigling', color: '#6cbf4a', art: l => `<g stroke="${l}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M60 42C59 34 60 28 61 22" fill="none"/>
+    <path d="M60 26C48 8 30 6 18 12C22 28 42 36 60 26Z" fill="#4fb35a"/><path d="M60 26C72 6 92 4 104 10C100 28 78 36 60 26Z" fill="#6cc96a"/>
+    <path d="M28 76C16 72 9 80 8 90C20 94 30 90 33 82Z" fill="#4fb35a"/><path d="M92 76C104 72 111 80 112 90C100 94 90 90 87 82Z" fill="#4fb35a"/>
+    <ellipse cx="44" cy="108" rx="12" ry="7" fill="#57b35a"/><ellipse cx="76" cy="108" rx="12" ry="7" fill="#57b35a"/>
+    <path d="M60 36C86 36 98 54 98 72C98 94 82 106 60 106C38 106 22 94 22 72C22 54 34 36 60 36Z" fill="#8ad97f"/></g>
+    <path d="M60 104C82 104 96 92 96 72C96 88 80 96 60 96C40 96 24 88 24 72C24 92 38 104 60 104Z" fill="#62bd63"/>
+    <ellipse cx="60" cy="90" rx="19" ry="13" fill="#ecf9cf"/>
+    ${eyes(66, '#2d8a4e', l)}${blush(79, '#f7a9a0')}
+    <path d="M53 79C56 84 64 84 67 79" fill="none" stroke="${l}" stroke-width="3" stroke-linecap="round"/>
+    <path d="M38 46C43 42 49 40 54 40" fill="none" stroke="#c8f2b8" stroke-width="4" stroke-linecap="round"/>` , line: '#1f5a2e' },
+  flame: { name: 'Emberpup', color: '#f7a823', art: l => `<g stroke="${l}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M36 112C28 92 36 70 60 70C84 70 92 92 84 112Z" fill="#f58a3c"/>
+    <ellipse cx="46" cy="110" rx="11" ry="6.5" fill="#f58a3c"/><ellipse cx="74" cy="110" rx="11" ry="6.5" fill="#f58a3c"/>
+    <path d="M32 26C20 16 10 22 8 36C6 50 13 60 22 58C30 52 34 38 32 26Z" fill="#c9561a"/><path d="M88 26C100 16 110 22 112 36C114 50 107 60 98 58C90 52 86 38 88 26Z" fill="#c9561a"/>
+    <ellipse cx="60" cy="44" rx="34" ry="29" fill="#f58a3c"/>
+    <path d="M84 102C98 106 106 100 105 88" fill="none" stroke-width="12"/><path d="M84 102C98 106 106 100 105 88" fill="none" stroke="#f58a3c" stroke-width="7"/>
+    <path d="M105 92C93 86 94 74 100 68C101 62 104 57 109 52C110 60 117 65 117 76C117 86 113 92 105 92Z" fill="#ff5a1f"/></g>
+    <path d="M105 88C99 84 100 77 104 73C105 69 107 66 109 64C110 69 113 72 113 78C113 84 110 88 105 88Z" fill="#ffb020"/><path d="M106 86C103 83 104 80 106 77C108 80 110 81 109 84C108 86 107 86 106 86Z" fill="#fff0a0"/>
+    <ellipse cx="60" cy="96" rx="14" ry="13" fill="#ffe6bd"/>
+    <ellipse cx="60" cy="57" rx="17" ry="13" fill="#ffe6bd"/>
+    ${eyes(38, '#2a78c8', l)}${blush(52, '#f2653a')}
+    <ellipse cx="60" cy="51" rx="4.5" ry="3.2" fill="${l}"/>
+    <path d="M60 54V58M52 58C55 63 58 62 60 58C62 62 65 63 68 58" fill="none" stroke="${l}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`, line: '#7a2c0c' },
+  wave: { name: 'Ripplet', color: '#4aa6ee', art: l => `<g stroke="${l}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M28 66C14 56 6 62 4 74C12 74 12 84 22 86C28 84 32 76 28 66Z" fill="#a4dcfb"/><path d="M92 66C106 56 114 62 116 74C108 74 108 84 98 86C92 84 88 76 92 66Z" fill="#a4dcfb"/>
+    <ellipse cx="44" cy="110" rx="11" ry="6" fill="#3a8fdc"/><ellipse cx="76" cy="110" rx="11" ry="6" fill="#3a8fdc"/>
+    <path d="M60 8C66 28 98 46 98 76C98 98 82 110 60 110C38 110 22 98 22 76C22 46 54 28 60 8Z" fill="#62baf6"/></g>
+    <path d="M60 108C82 108 96 96 96 76C96 92 80 100 60 100C40 100 24 92 24 76C24 96 38 108 60 108Z" fill="#3d97e2"/>
+    <ellipse cx="60" cy="93" rx="20" ry="13" fill="#e8f7ff"/>
+    <path d="M47 39C43 44 39 50 37 56" fill="none" stroke="#d6f0ff" stroke-width="5" stroke-linecap="round"/>
+    ${eyes(69, '#123f7a', l)}${blush(82, '#f59bb0')}
+    <path d="M53 82C56 87 64 87 67 82" fill="none" stroke="${l}" stroke-width="3" stroke-linecap="round"/>`, line: '#123f7a' },
 };
 const PIXEL_CAR = { w: 16, palette: { k: '#1c1208', r: '#d8280c', d: '#8e1a06', w: '#bfe6ff', g: '#9a9a9a' },
   rows: ['................', '....kkkkkkkk....', '...krwwwrwwwk...', '..krrwwwrwwwrk..', '.kkkkkkkkkkkkkk.', 'krrrrrrrrrrrrrrk', 'krdrrrrrrrrrrdrk', 'krrkkkrrrrkkkrrk', 'kkkkgkkkkkkgkkkk', '...kkk....kkk...'] };
 
-function creatureGrid(id) {
-  const grid = Array.from({ length: 20 }, () => Array(20).fill('.'));
-  CREATURE_BODY.forEach((row, y) => [...row].forEach((c, x) => { if (c !== '.') grid[y + 5][x + 2] = c; }));
-  for (const [x, y, row] of PARTNERS[id].parts) [...row].forEach((c, i) => { if (c !== '.' && x + i < 20) grid[y][x + i] = c; });
-  return { rows: grid.map(r => r.join('')), palette: PARTNERS[id].palette };
+function creatureSvg(id, size) {
+  const p = PARTNERS[id];
+  return `<svg class="creature" xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 120 120" aria-hidden="true">${p.art(p.line)}</svg>`;
+}
+// The canvas takes the same drawing as an image, so the recap and the app show the same creature.
+function drawCreature(g, id, x, y, size) {
+  return new Promise(res => {
+    const im = new Image();
+    im.onload = () => { g.drawImage(im, x, y, size, size); res(); };
+    im.onerror = () => res();
+    im.src = `data:image/svg+xml,${encodeURIComponent(creatureSvg(id, size))}`;
+  });
 }
 function spriteHtml({ rows, palette }, cell) {
   const w = rows[0].length, h = rows.length;
@@ -1468,7 +1571,7 @@ function spriteHtml({ rows, palette }, cell) {
 function drawSprite(g, { rows, palette }, x, y, cell) {
   rows.forEach((row, r) => [...row].forEach((c, i) => { if (palette[c]) { g.fillStyle = palette[c]; g.fillRect(x + i * cell, y + r * cell, cell, cell); } }));
 }
-const themeSprite = () => settings.theme === 'monster' ? creatureGrid(settings.partner) : settings.theme === 'pixel' ? PIXEL_CAR : null;
+const themeArt = (creatureSize, pixelCell) => settings.theme === 'monster' ? creatureSvg(settings.partner, creatureSize) : settings.theme === 'pixel' ? spriteHtml(PIXEL_CAR, pixelCell) : ic('car');
 
 function applyTheme() {
   const theme = THEMES[settings.theme] ? settings.theme : 'kairos', partner = PARTNERS[settings.partner] ? settings.partner : 'flame', root = document.documentElement;
@@ -1478,15 +1581,14 @@ function applyTheme() {
   root.dataset.partner = partner;
   document.querySelector('meta[name="theme-color"]').content = THEMES[theme].color || PARTNERS[partner].color;
   $('theme-fonts').href = THEMES[theme].fonts ? `https://fonts.googleapis.com/css2?family=${THEMES[theme].fonts}&display=swap` : 'data:text/css,';
-  const sprite = themeSprite();
-  $('mascot').innerHTML = sprite ? spriteHtml(sprite, theme === 'monster' ? 4 : 5) : ic('car');
+  $('mascot').innerHTML = themeArt(84, 5);
   $('partner-card').hidden = theme !== 'monster';
   try { localStorage.setItem('ct-theme', theme); localStorage.setItem('ct-partner', partner); } catch (e) {}
 }
 
 function renderThemeOptions() {
   $('theme-list').innerHTML = Object.entries(THEMES).map(([id, t]) => `<label class="theme-opt"><input type="radio" name="theme" value="${id}"${id === settings.theme ? ' checked' : ''}><span class="theme-swatch" style="background:${t.swatch}"></span><span><b>${t.name}</b><small>${t.note}</small></span></label>`).join('');
-  $('partner-list').innerHTML = Object.entries(PARTNERS).map(([id, p]) => `<label class="partner">${spriteHtml(creatureGrid(id), 3)}${p.name}<input type="radio" name="partner" value="${id}" aria-label="${p.name}"${id === settings.partner ? ' checked' : ''}></label>`).join('');
+  $('partner-list').innerHTML = Object.entries(PARTNERS).map(([id, p]) => `<label class="partner">${creatureSvg(id, 64)}${p.name}<input type="radio" name="partner" value="${id}" aria-label="${p.name}"${id === settings.partner ? ' checked' : ''}></label>`).join('');
 }
 function pickLook(e) {
   if (e.target.name === 'theme') settings.theme = e.target.value;
@@ -1525,10 +1627,10 @@ function setGrand(value) {
 function celebrateDone(ev) {
   const added = eventTotal(ev) - openedTotal;
   if (ev.example || added <= 0) return;
-  const sprite = themeSprite(), trip = document.createElement('div');
+  const trip = document.createElement('div');
   trip.className = 'trip';
   trip.setAttribute('role', 'status');
-  trip.innerHTML = `<div class="trip-track"><span class="trip-car">${sprite ? spriteHtml(sprite, settings.theme === 'monster' ? 2 : 2.4) : ic('car')}</span><svg class="pin trip-pin"><use href="#i-pin"/></svg></div>
+  trip.innerHTML = `<div class="trip-track"><span class="trip-car">${themeArt(36, 2.4)}</span><svg class="pin trip-pin"><use href="#i-pin"/></svg></div>
     <b>${esc(rupiah(added))} claimed · ${esc(rupiah(eventBack(ev) - openedBack))} back</b>`;
   document.body.append(trip);
   setTimeout(() => trip.remove(), 2000);
@@ -1601,8 +1703,8 @@ async function drawRecap(stats) {
   text(monthLabel(), 64, 200, 68, heroFg, 700, 640);
   text('Total claimed', 64, 286, 34, heroFg, 500, 640);
   text(rupiah(stats.claimed), 64, 350, 58, heroFg, 700, 640);
-  const sprite = themeSprite();
-  if (sprite) drawSprite(g, sprite, W - 64 - sprite.rows[0].length * 11, 110, 11);
+  if (settings.theme === 'monster') await drawCreature(g, settings.partner, W - 64 - 240, 90, 240);
+  else if (settings.theme === 'pixel') drawSprite(g, PIXEL_CAR, W - 64 - PIXEL_CAR.rows[0].length * 11, 110, 11);
   tile(64, 420, 462, 230, 'Distance', `${stats.km.toLocaleString('en-US')} km`, 76);
   tile(554, 420, 462, 230, 'Clients', String(stats.clients), 76);
   tile(64, 678, 952, 200, 'Most visited', stats.top || '-', 60);
